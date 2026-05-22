@@ -462,8 +462,8 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
         <canvas id="chartDevolPlanta"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Devoluciones por Día <span class="chart-tag">BARRAS</span></div>
-        <canvas id="chartDevolDia"></canvas>
+        <div class="chart-title">Pareto por Departamento <span class="chart-tag">BARRAS</span></div>
+        <canvas id="chartParetoDepartamento"></canvas>
       </div>
     </div>
     <div class="table-card">
@@ -1763,13 +1763,60 @@ function renderDevoluciones(filteredDev, filtered) {
   allDev.forEach(r=>{ const k=r.dia; byDia[k]=(byDia[k]||0)+1; });
   const diaKeys = Object.keys(byDia).map(Number).sort((a,b)=>a-b);
 
-  destroyChart('chartDevolDia');
-  CHARTS.chartDevolDia = new Chart(document.getElementById('chartDevolDia'),{
+  // Pareto por Departamento (dinámico según planta seleccionada)
+  destroyChart('chartParetoDepartamento');
+  
+  // Agrupar devoluciones por departamento (responsable)
+  const byDept = {};
+  allDev.forEach(r => {
+    const dept = r.responsable || 'Sin asignar';
+    byDept[dept] = (byDept[dept] || 0) + 1;
+  });
+  
+  // Ordenar por cantidad descendente y calcular acumulado para Pareto
+  const deptSorted = Object.entries(byDept)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, 10); // Top 10 departamentos
+  
+  let acumPercent = 0;
+  const acumData = deptSorted.map(([dept, count]) => {
+    acumPercent += (count / allDev.length) * 100;
+    return acumPercent;
+  });
+  
+  CHARTS.chartParetoDepartamento = new Chart(document.getElementById('chartParetoDepartamento'),{
     type:'bar',
-    data:{ labels:diaKeys.map(d=>`D${d}`),
-      datasets:[{ label:'Devoluciones', data:diaKeys.map(d=>byDia[d]), backgroundColor:'rgba(214,48,49,0.5)', borderColor:'#d63031', borderWidth:1 }]
+    data:{
+      labels: deptSorted.map(([d]) => d.length > 15 ? d.substr(0,15)+'…' : d),
+      datasets:[
+        { 
+          label:'Devoluciones', 
+          data:deptSorted.map(([,c])=>c),
+          backgroundColor:'rgba(214,48,49,0.5)', 
+          borderColor:'#d63031', 
+          borderWidth:1,
+          yAxisID:'y'
+        },
+        {
+          label:'% Acumulado',
+          data:acumData,
+          type:'line',
+          borderColor:'#0066cc',
+          backgroundColor:'transparent',
+          borderWidth:2,
+          pointRadius:4,
+          pointBackgroundColor:'#0066cc',
+          yAxisID:'y1'
+        }
+      ]
     },
-    options: chartOpts()
+    options:{
+      ...chartOpts(),
+      scales:{
+        y:{ position:'left', ticks:{callback:v=>`${v}`} },
+        y1:{ position:'right', min:0, max:100, ticks:{callback:v=>`${v}%`} }
+      }
+    }
   });
 
   // Tabla
