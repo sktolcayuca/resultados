@@ -1166,13 +1166,13 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   const sumaTonsProd = datosPrev.reduce((sum, r) => sum + (r.tonProd || 0), 0);
   const sumaM2 = datosPrev.reduce((sum, r) => sum + (r.m2 || 0), 0);
   
-  // Fórmula correcta: (kilos / tons) * 100
+  // Fórmula correcta: TODOS usan Tons Producidas como denominador
   const sPrev = {
     tonEmb: sumaTonsEmb,
     tonProd: sumaTonsProd,
     m2: sumaM2,
-    pctTrim: sumaTonsEmb > 0 ? (sumaKilosTrim / sumaTonsEmb) * 100 : 0,
-    pctPagada: sumaTonsEmb > 0 ? (sumaKilosPag / sumaTonsEmb) * 100 : 0,
+    pctTrim: sumaTonsProd > 0 ? (sumaKilosTrim / sumaTonsProd) * 100 : 0,
+    pctPagada: sumaTonsProd > 0 ? (sumaKilosPag / sumaTonsProd) * 100 : 0,
     pctProc: sumaTonsProd > 0 ? (sumaKilosProc / sumaTonsProd) * 100 : 0
   };
   
