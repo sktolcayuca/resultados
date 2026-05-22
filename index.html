@@ -1155,7 +1155,9 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   const filtrarMesPrev = (arr) => arr.filter(r =>
     r.anio===anioPrev && r.mes===mesPrevNum && r.dia<=corte
   );
-  const datosPrev = filtrarMesPrev(DATA[planta]);
+  const plantaUpper = planta.charAt(0).toUpperCase() + planta.slice(1); // 'sk' → 'Sk'... wait, mejor usa el mapa
+  const plantaKey = { sk: 'SK', glama: 'Glama', desa: 'Desa' }[planta] || planta;
+  const datosPrev = filtrarMesPrev(DATA[plantaKey] || []);
   const sPrev     = calcStats(datosPrev);
   
   // DEBUG: Mostrar qué datos se usan para comparativo
@@ -1243,12 +1245,23 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   `;
 
   // Comparativo mes anterior
-  // Solo comparar si hay datos válidos en el mes anterior
-  const dE  = (sPrev.tonEmb && sPrev.tonEmb > 0) ? delta(s.tonEmb,  sPrev.tonEmb) : { txt:'—', cls:'neu' };
-  const dP  = (sPrev.tonProd && sPrev.tonProd > 0) ? delta(s.tonProd, sPrev.tonProd) : { txt:'—', cls:'neu' };
-  const dM2 = (sPrev.m2 && sPrev.m2 > 0) ? delta(s.m2,      sPrev.m2) : { txt:'—', cls:'neu' };
-  const dT  = (sPrev.pctTrim && sPrev.pctTrim > 0) ? deltaInv(s.pctTrim, sPrev.pctTrim) : { txt:'—', cls:'neu' };
-  const dPr = (sPrev.pctProc && sPrev.pctProc > 0) ? deltaInv(s.pctProc, sPrev.pctProc) : { txt:'—', cls:'neu' };
+  const dE  = delta(s.tonEmb,  sPrev.tonEmb);
+  const dP  = delta(s.tonProd, sPrev.tonProd);
+  const dM2 = delta(s.m2,      sPrev.m2);
+  const dT  = deltaInv(s.pctTrim, sPrev.pctTrim);
+  const dPr = deltaInv(s.pctProc, sPrev.pctProc);
+  
+  // LOG para debuggear
+  if (planta === 'sk') {
+    console.log('COMPARATIVO SK:', {
+      mesActual: `${mes}/${anio}`, corte,
+      mesPrev: `${mesPrevNum}/${anioPrev}`,
+      'Actual.tonEmb': s.tonEmb,
+      'Prev.tonEmb': sPrev.tonEmb,
+      'delta calc': sPrev.tonEmb > 0 ? ((s.tonEmb - sPrev.tonEmb) / sPrev.tonEmb * 100).toFixed(1) : 'N/A',
+      dE
+    });
+  }
 
   const compRow = (label, val, unit, d) => `
     <div class="comp-row">
@@ -1316,7 +1329,7 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   // Mes anterior: mismo rango de días
   const mesPrevN = mes===1 ? 12 : mes-1;
   const anioPrevN = mes===1 ? anio-1 : anio;
-  const dataMesPrev = DATA[planta].filter(r=>r.anio===anioPrevN && r.mes===mesPrevN)
+  const dataMesPrev = (DATA[plantaKey] || []).filter(r=>r.anio===anioPrevN && r.mes===mesPrevN)
     .sort((a,b)=>a.dia-b.dia);
   let acP=0;
   const accumsMesPrev = sortedData.map(r=>{
@@ -1326,7 +1339,7 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   });
 
   // Año anterior: mismo mes, mismo rango de días
-  const dataAnioPrev = DATA[planta].filter(r=>r.anio===(anio-1) && r.mes===mes)
+  const dataAnioPrev = (DATA[plantaKey] || []).filter(r=>r.anio===(anio-1) && r.mes===mes)
     .sort((a,b)=>a.dia-b.dia);
   let acY=0;
   const accumsAnioPrev = sortedData.map(r=>{
@@ -1552,10 +1565,11 @@ function renderDevoluciones(filteredDev, filtered) {
 // ═══════════════════════════════════════════════════════════════
 function renderTablaDiario(mes, anio, corte) {
   const plantaId = document.getElementById('filterPlantaDiario').value;
+  const plantaIdKey = { sk: 'SK', glama: 'Glama', desa: 'Desa' }[plantaId] || plantaId;
   const mesVal   = document.getElementById('filterMes').value;
   const mesAll   = mesVal === 'all';
 
-  const datos = DATA[plantaId].filter(r =>
+  const datos = (DATA[plantaIdKey] || []).filter(r =>
     r.anio === anio && (mesAll || (r.mes === mes && r.dia <= corte))
   ).sort((a,b)=>b.dia-a.dia);
 
