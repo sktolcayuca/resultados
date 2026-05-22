@@ -1148,6 +1148,11 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   const promDiario = s.diasProd>0 ? s.tonEmb/s.diasProd : 0;
   const diasLab = meta.diasLab || 22; // Fallback a 22 si no viene de meta
   const estimadoMes = promDiario * diasLab;
+  
+  // M2: promedio diario y estimado (como Tons Embarcadas)
+  const promM2Diario = s.diasProd>0 ? s.m2/s.diasProd : 0;
+  const estimadoM2 = promM2Diario * (meta.diasLab || 22);
+  const pctM2 = meta.metaM2>0 ? pct(s.m2,meta.metaM2) : 0;
   document.getElementById(`kpi${id}`).innerHTML = `
     <div class="kpi-card ${avance>=90?'green':avance>=70?'warn':'danger'}">
       <div class="kpi-label">Tons Embarcadas</div>
@@ -1173,14 +1178,9 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
       <div class="kpi-unit">de ${datos.length} días en período</div>
     </div>`;
 
-  // KPIs merma — NUEVO ORDEN: Trim%, Trim kg, Pagada%, Proceso%, Total%, M2
+  // KPIs merma — NUEVO ORDEN: Trim%, Trim kg, Pagada%, Proceso%, Total%
   const dTrim = s.pctTrim - META_TRIM_PCT;
   const dProc = s.pctProc - META_PROC_PCT;
-  
-  // M2: promedio diario y estimado (como Tons Embarcadas)
-  const promM2Diario = s.diasProd>0 ? s.m2/s.diasProd : 0;
-  const estimadoM2 = promM2Diario * (meta.diasLab || 22);
-  const pctM2 = meta.metaM2>0 ? pct(s.m2,meta.metaM2) : 0;
   
   // Merma Total = Pagada + Proceso (sin Trim)
   const pctMermaTotal = s.pctPagada + s.pctProc;
