@@ -1097,6 +1097,9 @@ function renderResumen(filtered, filteredDev, metas) {
   total.pctPagada = total.tonProd>0 ? total.mermaPagada/total.tonProd*100 : 0;
   total.pctProc   = total.tonProd>0 ? total.mermaProc/total.tonProd*100   : 0;
   
+  // Días laborales TOTAL para 3 plantas (definir PRIMERO)
+  const diasLabTotal = metas.SK.diasLab + metas.Glama.diasLab + metas.Desa.diasLab;
+  
   // Calcular promedio y estimado de TONS EMBARCADAS
   const promTonsEmb = total.diasProd>0 ? total.tonEmb/total.diasProd : 0;
   const metaTonsTotal = metas.SK.metaTons + metas.Glama.metaTons + metas.Desa.metaTons;
@@ -1105,7 +1108,6 @@ function renderResumen(filtered, filteredDev, metas) {
   
   // Calcular promedio y estimado de m²
   const promM2Diario = total.diasProd>0 ? total.m2/total.diasProd : 0;
-  const diasLabTotal = metas.SK.diasLab + metas.Glama.diasLab + metas.Desa.diasLab; // Total días laborales para 3 plantas
   const estimadoM2Total = promM2Diario * diasLabTotal;
   const metaM2Total = metas.SK.metaM2 + metas.Glama.metaM2 + metas.Desa.metaM2;
   const pctM2Total = metaM2Total>0 ? pct(total.m2, metaM2Total) : 0;
