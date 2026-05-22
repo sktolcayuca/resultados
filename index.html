@@ -123,14 +123,6 @@ td.hl{color:var(--text);}td.acc{color:var(--accent);}td.dng{color:var(--danger);
 .chip-warn{background:rgba(230,168,23,0.1);color:var(--warn);border:1px solid rgba(230,168,23,0.3);}
 .chip-bad{background:rgba(214,48,49,0.1);color:var(--danger);border:1px solid rgba(214,48,49,0.3);}
 
-/* MULTI-SELECTOR MESES */
-.multi-mes-selector{background:var(--surface);border:1px solid var(--border);padding:12px 16px;border-radius:2px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
-.mes-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:2px;font-family:var(--font-mono);font-size:10px;cursor:pointer;transition:all .2s;}
-.mes-tag:hover{border-color:var(--accent);background:#e8f0ff;}
-.mes-tag.active{background:rgba(0,102,204,0.15);border-color:var(--accent);color:var(--accent);font-weight:600;}
-.mes-tag-remove{font-size:14px;font-weight:700;cursor:pointer;opacity:0;transition:opacity .2s;}
-.mes-tag.active .mes-tag-remove{opacity:1;}
-
 /* RESUMEN PLANTAS */
 .plantas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:22px;}
 .planta-card{background:var(--surface);border:1px solid var(--border);padding:20px;border-radius:2px;}
@@ -204,13 +196,6 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
   <div class="periodo-item"><div class="periodo-label">CORTE</div><div class="periodo-val" id="pCorte">—</div></div>
   <div class="periodo-sep"></div>
   <div class="periodo-item"><div class="periodo-label">ÚLTIMA CARGA</div><div class="periodo-val" id="pCarga">—</div></div>
-</div>
-
-<div style="padding:12px 28px;border-bottom:1px solid var(--border);background:var(--surface);">
-  <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">📅 SELECCIONA MESES PARA COMPARAR:</div>
-  <div class="multi-mes-selector" id="multiMesSelector">
-    <!-- Se llena dinámicamente -->
-  </div>
 </div>
 
 <main id="mainContent">
@@ -1475,42 +1460,8 @@ function switchTab(name) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MULTI-SELECTOR DE MESES
-// ═══════════════════════════════════════════════════════════════
-let selectedMeses = [1,2,3,4,5,6,7,8,9,10,11,12]; // Por defecto todos
-
-function initMesesSelector(){
-  const selector = document.getElementById('multiMesSelector');
-  if(!selector) return;
-  selector.innerHTML = MESES.slice(1).map((m,i)=>`
-    <div class="mes-tag active" data-mes="${i+1}" onclick="toggleMes(${i+1})">
-      <span>${m}</span>
-      <span class="mes-tag-remove">×</span>
-    </div>
-  `).join('');
-}
-
-function toggleMes(mes){
-  const idx = selectedMeses.indexOf(mes);
-  if(idx===-1) selectedMeses.push(mes);
-  else selectedMeses.splice(idx,1);
-  selectedMeses.sort((a,b)=>a-b);
-  updateMesDisplay();
-  loadData(); // Recargar datos con nuevo filtro
-}
-
-function updateMesDisplay(){
-  document.querySelectorAll('.mes-tag').forEach(tag=>{
-    const mes = parseInt(tag.dataset.mes);
-    const isActive = selectedMeses.includes(mes);
-    tag.classList.toggle('active',isActive);
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-initMesesSelector();
 loadData();
 // Refresco automático cada 10 minutos
 setInterval(loadData, 10 * 60 * 1000);
