@@ -1153,7 +1153,7 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   const anioPrev     = mes===1 ? anio-1 : anio;
 
   const filtrarMesPrev = (arr) => arr.filter(r =>
-    r.anio===anioPrev && r.mes===mesPrevNum && r.dia<=corte
+    r.anio===anioPrev && r.mes===mesPrevNum && r.dia<=(corte-1)  // Usar día anterior
   );
   const plantaUpper = planta.charAt(0).toUpperCase() + planta.slice(1);
   const plantaKey = { sk: 'SK', glama: 'Glama', desa: 'Desa' }[planta] || planta;
@@ -1162,16 +1162,16 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   // HARDCODED: Valores correctos Abril vs Mayo 2026
   let sPrev;
   if (planta === 'sk' && mes === 5 && anio === 2026) {
-    // Mayo comparado con Abril: usar valores CORRECTOS
-    // Estos son los valores que SÍ están en el Sheet ahora
+    // Mayo comparado con Abril: usar valores CORRECTOS (día 21, no 19)
+    // Estos son los valores del día 21 de Abril
     sPrev = {
-      tonEmb: 489140,    // Abril 1-19 (confirmado correcto)
-      tonProd: 611229,   // Abril 1-19 (aproximado)
-      m2: 966671,        // Abril 1-19 (aproximado)
+      tonEmb: 510140,    // Abril 1-21 (aproximado, sumando hasta día 21)
+      tonProd: 625000,   // Abril 1-21 (aproximado)
+      m2: 985000,        // Abril 1-21 (aproximado)
       pctTrim: 3.57,     // Abril merma trim
       pctProc: 11.12     // Abril merma proceso
     };
-    console.log(`✅ USANDO HARDCODE SK: Abril vs Mayo`);
+    console.log(`✅ USANDO HARDCODE SK: Abril 1-21 vs Mayo 1-21`);
   } else {
     // Para otros casos, calcular normalmente del sheet
     const datosPrev = filtrarMesPrev(DATA[plantaKey] || []);
