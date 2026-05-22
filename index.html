@@ -1153,35 +1153,37 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   const anioPrev     = mes===1 ? anio-1 : anio;
 
   const filtrarMesPrev = (arr) => arr.filter(r =>
-    r.anio===anioPrev && r.mes===mesPrevNum && r.dia<=(corte-1)  // Usar día anterior
+    r.anio===anioPrev && r.mes===mesPrevNum && r.dia<=(corte-1)
   );
-  const plantaUpper = planta.charAt(0).toUpperCase() + planta.slice(1);
   const plantaKey = { sk: 'SK', glama: 'Glama', desa: 'Desa' }[planta] || planta;
   const datosPrev = filtrarMesPrev(DATA[plantaKey] || []);
   
-  // HARDCODED: Valores correctos Abril vs Mayo 2026
-  let sPrev;
-  if (planta === 'sk' && mes === 5 && anio === 2026) {
-    // Mayo comparado con Abril: usar valores CORRECTOS (día 21, no 19)
-    // Estos son los valores del día 21 de Abril
-    sPrev = {
-      tonEmb: 510140,    // Abril 1-21 (aproximado, sumando hasta día 21)
-      tonProd: 625000,   // Abril 1-21 (aproximado)
-      m2: 985000,        // Abril 1-21 (aproximado)
-      pctTrim: 3.57,     // Abril merma trim
-      pctProc: 11.12     // Abril merma proceso
-    };
-    console.log(`✅ USANDO HARDCODE SK: Abril 1-21 vs Mayo 1-21`);
-  } else {
-    // Para otros casos, calcular normalmente del sheet
-    const datosPrev = filtrarMesPrev(DATA[plantaKey] || []);
-    sPrev = {
-      tonEmb: datosPrev.reduce((sum, r) => sum + (r.tonEmb || 0), 0),
-      tonProd: datosPrev.reduce((sum, r) => sum + (r.tonProd || 0), 0),
-      m2: datosPrev.reduce((sum, r) => sum + (r.m2 || 0), 0),
-      pctTrim: datosPrev.length > 0 ? (datosPrev.reduce((sum, r) => sum + (r.mermaTrim || 0), 0) / Math.max(datosPrev.reduce((sum, r) => sum + (r.tonEmb || 0), 0) * 10, 1)) : 0,
-      pctProc: datosPrev.length > 0 ? (datosPrev.reduce((sum, r) => sum + (r.mermaProc || 0), 0) / Math.max(datosPrev.reduce((sum, r) => sum + (r.tonProd || 0), 0) * 10, 1)) : 0
-    };
+  // Calcular dinámicamente con fórmula correcta
+  const sumaKilosTrim = datosPrev.reduce((sum, r) => sum + (r.mermaTrim || 0), 0);
+  const sumaKilosPag = datosPrev.reduce((sum, r) => sum + (r.mermaPagada || 0), 0);
+  const sumaKilosProc = datosPrev.reduce((sum, r) => sum + (r.mermaProc || 0), 0);
+  const sumaTonsEmb = datosPrev.reduce((sum, r) => sum + (r.tonEmb || 0), 0);
+  const sumaTonsProd = datosPrev.reduce((sum, r) => sum + (r.tonProd || 0), 0);
+  const sumaM2 = datosPrev.reduce((sum, r) => sum + (r.m2 || 0), 0);
+  
+  // Fórmula correcta: (kilos / tons) * 100
+  const sPrev = {
+    tonEmb: sumaTonsEmb,
+    tonProd: sumaTonsProd,
+    m2: sumaM2,
+    pctTrim: sumaTonsEmb > 0 ? (sumaKilosTrim / sumaTonsEmb) * 100 : 0,
+    pctPagada: sumaTonsEmb > 0 ? (sumaKilosPag / sumaTonsEmb) * 100 : 0,
+    pctProc: sumaTonsProd > 0 ? (sumaKilosProc / sumaTonsProd) * 100 : 0
+  };
+  
+  if (planta === 'sk' || planta === 'desa' || planta === 'glama') {
+    console.log(`✅ COMPARATIVO DINÁMICO ${planta.toUpperCase()}:`, {
+      mes: `${mesPrevNum}/${anioPrev}`, corte: corte-1,
+      registros: datosPrev.length,
+      pctTrim: sPrev.pctTrim.toFixed(2),
+      pctPagada: sPrev.pctPagada.toFixed(2),
+      pctProc: sPrev.pctProc.toFixed(2)
+    });
   }
 
   // KPIs producción
