@@ -1243,11 +1243,12 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   `;
 
   // Comparativo mes anterior
-  const dE  = delta(s.tonEmb,  sPrev.tonEmb);
-  const dP  = delta(s.tonProd, sPrev.tonProd);
-  const dM2 = delta(s.m2,      sPrev.m2);
-  const dT  = deltaInv(s.pctTrim, sPrev.pctTrim);
-  const dPr = deltaInv(s.pctProc, sPrev.pctProc);
+  // Solo comparar si hay datos válidos en el mes anterior
+  const dE  = (sPrev.tonEmb && sPrev.tonEmb > 0) ? delta(s.tonEmb,  sPrev.tonEmb) : { txt:'—', cls:'neu' };
+  const dP  = (sPrev.tonProd && sPrev.tonProd > 0) ? delta(s.tonProd, sPrev.tonProd) : { txt:'—', cls:'neu' };
+  const dM2 = (sPrev.m2 && sPrev.m2 > 0) ? delta(s.m2,      sPrev.m2) : { txt:'—', cls:'neu' };
+  const dT  = (sPrev.pctTrim && sPrev.pctTrim > 0) ? deltaInv(s.pctTrim, sPrev.pctTrim) : { txt:'—', cls:'neu' };
+  const dPr = (sPrev.pctProc && sPrev.pctProc > 0) ? deltaInv(s.pctProc, sPrev.pctProc) : { txt:'—', cls:'neu' };
 
   const compRow = (label, val, unit, d) => `
     <div class="comp-row">
