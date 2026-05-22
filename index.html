@@ -1254,17 +1254,14 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
       
       <!-- PACE OF PLAY - PROYECCIÓN -->
       <div style="background:rgba(214,48,49,0.08);border:1px solid rgba(214,48,49,0.2);padding:10px;margin:8px 0 12px 0;border-radius:2px;font-family:var(--font-mono);font-size:8px;color:var(--text-muted);line-height:1.6;">
-        <div style="font-weight:700;margin-bottom:6px;color:var(--text-dim);">📊 PROYECCIÓN (Día ${diaCorte}/${meta.diasLab}):</div>
+        <div style="font-weight:700;margin-bottom:6px;color:var(--text-dim);">📊 PROYECCIÓN (Día ${s.diasProd}/${meta.diasLab}):</div>
         <div style="margin-bottom:4px;">
-          <strong>Tons:</strong> ${fmt(s.tonEmb/diaCorte)} kg/día → ${fmt((s.tonEmb/diaCorte)*meta.diasLab)} ${(s.tonEmb/diaCorte)*meta.diasLab>=meta.metaTons*1.05?'<span style="color:#00cc88;font-weight:700">🟢</span>':(s.tonEmb/diaCorte)*meta.diasLab>=meta.metaTons*0.95?'<span style="color:var(--warn);font-weight:700">🟡</span>':'<span style="color:var(--danger);font-weight:700">🔴</span>'}
+          <strong>Tons:</strong> ${fmt(s.tonEmb/s.diasProd)} kg/día → ${fmt((s.tonEmb/s.diasProd)*meta.diasLab)} ${(s.tonEmb/s.diasProd)*meta.diasLab>=meta.metaTons*1.05?'<span style="color:#00cc88;font-weight:700">🟢</span>':(s.tonEmb/s.diasProd)*meta.diasLab>=meta.metaTons*0.95?'<span style="color:var(--warn);font-weight:700">🟡</span>':'<span style="color:var(--danger);font-weight:700">🔴</span>'}
         </div>
         <div>
-          <strong>m²:</strong> ${fmt((s.m2/diaCorte),0)} m²/día → ${fmt(((s.m2/diaCorte)*meta.diasLab),0)} ${((s.m2/diaCorte)*meta.diasLab)>=meta.metaM2*1.05?'<span style="color:#00cc88;font-weight:700">🟢</span>':((s.m2/diaCorte)*meta.diasLab)>=meta.metaM2*0.95?'<span style="color:var(--warn);font-weight:700">🟡</span>':'<span style="color:var(--danger);font-weight:700">🔴</span>'}
+          <strong>m²:</strong> ${fmt((s.m2/s.diasProd),0)} m²/día → ${fmt(((s.m2/s.diasProd)*meta.diasLab),0)} ${((s.m2/s.diasProd)*meta.diasLab)>=meta.metaM2*1.05?'<span style="color:#00cc88;font-weight:700">🟢</span>':((s.m2/s.diasProd)*meta.diasLab)>=meta.metaM2*0.95?'<span style="color:var(--warn);font-weight:700">🟡</span>':'<span style="color:var(--danger);font-weight:700">🔴</span>'}
         </div>
       </div>
-      
-      ${compRow('Tons Embarcadas', s.tonEmb, `meta ${fmt(meta.metaTons)} kg`, { txt: fmt(avance,1)+'%', cls: avance>=90?'pos':avance>=70?'neu':'neg' })}
-      ${compRow('m² Producidos',   s.m2,     `meta ${fmt(meta.metaM2,0)} m²`, delta(s.m2, meta.metaM2))}
     </div>
     <div class="comp-card" style="border-color:rgba(230,168,23,0.25)">
       <div class="comp-title">📅 vs ${MESES[mesPrevNum]||mesPrevNum} ${anioPrev}</div>
