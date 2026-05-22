@@ -1000,7 +1000,7 @@ function applyFilters() {
   };
 
   // Renderizar
-  renderResumen(filtered, filteredDev, metas);
+  renderResumen(filtered, filteredDev, metas, mes || mesesSelected[0], anio, corte);
   renderPlanta('SK',    filtered.SK,    filteredDev.SK,    metas.SK,    filtered, mes || mesesSelected[0], anio, corte);
   renderPlanta('Glama', filtered.Glama, filteredDev.Glama, metas.Glama, filtered, mes || mesesSelected[0], anio, corte);
   renderPlanta('Desa',  filtered.Desa,  filteredDev.Desa,  metas.Desa,  filtered, mes || mesesSelected[0], anio, corte);
@@ -1078,7 +1078,7 @@ function chartOpts(unit='') {
 // ═══════════════════════════════════════════════════════════════
 // RENDER RESUMEN MULTIPLANTA
 // ═══════════════════════════════════════════════════════════════
-function renderResumen(filtered, filteredDev, metas) {
+function renderResumen(filtered, filteredDev, metas, mes, anio, corte) {
   const stats = {};
   PLANTAS.forEach(p => { stats[p] = calcStats(filtered[p]); });
 
@@ -1097,24 +1097,23 @@ function renderResumen(filtered, filteredDev, metas) {
   total.pctPagada = total.tonProd>0 ? total.mermaPagada/total.tonProd*100 : 0;
   total.pctProc   = total.tonProd>0 ? total.mermaProc/total.tonProd*100   : 0;
   
-  // Días laborales TOTAL para 3 plantas (definir PRIMERO)
-  const diasLabTotal = metas.SK.diasLab + metas.Glama.diasLab + metas.Desa.diasLab;
+  // Días laborales POR PLANTA (para calcular correctamente)
+  const diasLabPorPlanta = metas.SK.diasLab; // Todos tienen los mismos días laborales en el mes
   
-  // Calcular promedio y estimado de TONS EMBARCADAS
-  const promTonsEmb = total.diasProd>0 ? total.tonEmb/total.diasProd : 0;
+  // Calcular promedio y estimado de TONS EMBARCADAS (usando corte, no diasProd)
+  const promTonsEmb = corte > 0 ? total.tonEmb / corte : 0;
   const metaTonsTotal = metas.SK.metaTons + metas.Glama.metaTons + metas.Desa.metaTons;
-  const estimadoTonsTotal = promTonsEmb * diasLabTotal;
+  const estimadoTonsTotal = promTonsEmb * diasLabPorPlanta;
   const pctTonsTotal = metaTonsTotal>0 ? pct(total.tonEmb, metaTonsTotal) : 0;
   
   // Calcular promedio y estimado de m²
-  const promM2Diario = total.diasProd>0 ? total.m2/total.diasProd : 0;
-  const estimadoM2Total = promM2Diario * diasLabTotal;
+  const promM2Diario = corte > 0 ? total.m2 / corte : 0;
+  const estimadoM2Total = promM2Diario * diasLabPorPlanta;
   const metaM2Total = metas.SK.metaM2 + metas.Glama.metaM2 + metas.Desa.metaM2;
   const pctM2Total = metaM2Total>0 ? pct(total.m2, metaM2Total) : 0;
   
-  // Calcular faltante para meta (multiplanta)
-  const diaActual = new Date().getDate();
-  const diasRestantes = diasLabTotal - diaActual;
+  // Calcular faltante para meta (multiplanta) - usando días restantes del mes actual
+  const diasRestantes = diasLabPorPlanta - corte;
   const faltanteTons = Math.max(0, metaTonsTotal - total.tonEmb);
   const faltanteM2 = Math.max(0, metaM2Total - total.m2);
   const tonsDiaFaltante = diasRestantes > 0 ? faltanteTons / diasRestantes : 0;
