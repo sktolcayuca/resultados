@@ -978,6 +978,13 @@ function renderResumen(filtered, filteredDev, metas) {
       <div class="planta-stat"><span class="planta-stat-label">Tons Producidas</span><span class="planta-stat-val">${fmt(s.tonProd)} kg</span></div>
       <div class="planta-stat"><span class="planta-stat-label">m² Producidos</span><span class="planta-stat-val">${fmt(s.m2,0)}</span></div>
       <div class="planta-stat"><span class="planta-stat-label">Avance vs Meta</span><span class="planta-stat-val ${avance>=100?'up':avance>=75?'neutral':'down'}">${fmt(avance,1)}% (meta ${fmt(m.metaTons)} kg)</span></div>
+      
+      <!-- PACE OF PLAY -->
+      <div style="background:rgba(0,102,204,0.08);border:1px solid rgba(0,102,204,0.2);padding:10px;margin:8px 0;border-radius:2px;font-family:var(--font-mono);font-size:8px;color:var(--text-muted);line-height:1.5;">
+        <div style="font-weight:700;margin-bottom:4px;color:var(--text-dim);">⚠️ Proyección (Día 15/${m.diasLab}):</div>
+        <div>Prom: ${fmt(s.tonEmb/15)} kg/día → Proyec: ${fmt((s.tonEmb/15)*m.diasLab)} ${s.tonEmb/15*m.diasLab>=m.metaTons*0.95?'<span style="color:#00cc88">🟢</span>':s.tonEmb/15*m.diasLab>=m.metaTons*0.90?'<span style="color:var(--warn)">🟡</span>':'<span style="color:var(--danger)">🔴</span>'}</div>
+      </div>
+      
       <div class="planta-stat"><span class="planta-stat-label">% Merma Trim</span><span class="planta-stat-val"><span class="chip ${chipM(s.pctTrim,META_TRIM_PCT)}">${fmt(s.pctTrim,2)}%</span></span></div>
       <div class="planta-stat"><span class="planta-stat-label">% Merma Proceso</span><span class="planta-stat-val"><span class="chip ${chipM(s.pctProc,META_PROC_PCT)}">${fmt(s.pctProc,2)}%</span></span></div>
       <div class="planta-stat"><span class="planta-stat-label">Devoluciones</span><span class="planta-stat-val dng">${dv.length} (${fmt(sum(dv,'kilos'),0)} kg)</span></div>
@@ -1253,6 +1260,13 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
       ${compRow('Total devoluciones', devol.length,       'registros', {txt:'—',cls:'neu'})}
       ${compRow('Piezas devueltas',   sum(devol,'piezas'),'piezas',    {txt:'—',cls:'neu'})}
       ${compRow('Kilos devueltos',    sum(devol,'kilos'), 'kg',        {txt:'—',cls:'neu'})}
+      ${(() => {
+        const kilosDevol = sum(devol,'kilos');
+        const kilosEmb = s.tonEmb; // s.tonEmb está en kg (acumulado)
+        const pctDevolVsEmb = kilosEmb > 0 ? (kilosDevol / kilosEmb) * 100 : 0;
+        const metaDevolPct = META_DEVOL_PCT[planta] || 1.0;
+        return compRow('% Devolución vs Emb', pctDevolVsEmb, '%', {txt:pctDevolVsEmb<=metaDevolPct?'✓':'⚠', cls:pctDevolVsEmb<=metaDevolPct?'grn':'wrn'});
+      })()}
     </div>`;
 
   // Chart acumulado — mes actual + mes anterior + año anterior
