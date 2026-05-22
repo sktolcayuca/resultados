@@ -467,6 +467,13 @@ const GIDS = {
 const META_TRIM_PCT = 4;
 const META_PROC_PCT = 10.5;
 
+// Metas de devolución % vs tons embarcadas por planta
+const META_DEVOL_PCT = {
+  SK: 1.0,      // 1%
+  Glama: 0.9,   // 0.9%
+  Desa: 1.0     // 1%
+};
+
 const MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const PLANTAS = ['SK','Glama','Desa'];
 const PLANTA_LABELS = { SK:'Skarton', Glama:'Glama', Desa:'Desa' };
@@ -809,7 +816,7 @@ function applyFilters() {
   renderPlanta('SK',    filtered.SK,    filteredDev.SK,    metas.SK,    filtered, mes || mesesSelected[0], anio, corte);
   renderPlanta('Glama', filtered.Glama, filteredDev.Glama, metas.Glama, filtered, mes || mesesSelected[0], anio, corte);
   renderPlanta('Desa',  filtered.Desa,  filteredDev.Desa,  metas.Desa,  filtered, mes || mesesSelected[0], anio, corte);
-  renderDevoluciones(filteredDev);
+  renderDevoluciones(filteredDev, filtered);
   renderTablaDiario(mes || mesesSelected[0], anio, corte);
 }
 
@@ -1196,16 +1203,6 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
       <div class="kpi-unit">Pagada + Proceso</div>
       <div class="kpi-meta"><strong>${fmt(mermaTotalKg,0)}</strong> kg totales</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">m² Producidos</div>
-      <div class="kpi-value">${fmt(s.m2,0)}</div>
-      <div class="kpi-unit">m² — meta: ${fmt(meta.metaM2,0)} m²</div>
-      <div class="kpi-meta">
-        <div><strong>Prom/día:</strong> ${fmt(promM2Diario,0)} m²</div>
-        <div><strong>Estimado mes:</strong> ${fmt(estimadoM2,0)} m²</div>
-        <div style="margin-top:4px;">${fmt(pctM2,1)}% de meta</div>
-      </div>
-    </div>
 
   `;
 
@@ -1351,30 +1348,41 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
 // ═══════════════════════════════════════════════════════════════
 // RENDER DEVOLUCIONES
 // ═══════════════════════════════════════════════════════════════
-function renderDevoluciones(filteredDev) {
+function renderDevoluciones(filteredDev, filtered) {
   // Obtener el filtro de planta del dropdown
   const plantaFilter = document.getElementById('filterPlantaDevoluciones')?.value || 'ALL';
   
   // Filtrar devoluciones según la planta seleccionada
   let allDev = [];
+  let allProd = [];
   if(plantaFilter === 'ALL'){
     allDev = [...filteredDev.SK,...filteredDev.Glama,...filteredDev.Desa];
+    allProd = [...(filtered?.SK||[]),...(filtered?.Glama||[]),...(filtered?.Desa||[])];
   } else {
     const plantaMap = {sk:'SK', glama:'Glama', desa:'Desa'};
     const plantaKey = plantaMap[plantaFilter] || plantaFilter;
     allDev = filteredDev[plantaKey] || [];
+    allProd = filtered ? (filtered[plantaKey] || []) : [];
   }
   
   const totalCount  = allDev.length;
   const totalPiezas = sum(allDev,'piezas');
   const totalKilos  = sum(allDev,'kilos');
   const clientes    = new Set(allDev.map(r=>r.cliente)).size;
+  
+  // Calcular % devolución vs embarcado
+  const totalTonsEmb = sum(allProd,'tonEmb');
+  const pctDevolVsEmb = totalTonsEmb > 0 ? (totalKilos/1000) / totalTonsEmb * 100 : 0;
+  
+  // Meta según planta seleccionada
+  const metaDevolPct = plantaFilter === 'ALL' ? 0.95 : (META_DEVOL_PCT[plantaMap[plantaFilter]] || 1.0);
 
   document.getElementById('kpiDevol').innerHTML = `
     <div class="kpi-card danger"><div class="kpi-label">Total Devoluciones</div><div class="kpi-value">${totalCount}</div><div class="kpi-unit">registros</div></div>
     <div class="kpi-card warn"><div class="kpi-label">Piezas Devueltas</div><div class="kpi-value">${fmt(totalPiezas)}</div><div class="kpi-unit">piezas</div></div>
     <div class="kpi-card orange"><div class="kpi-label">Kilos Devueltos</div><div class="kpi-value">${fmt(totalKilos,0)}</div><div class="kpi-unit">kg</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Clientes Afectados</div><div class="kpi-value">${clientes}</div><div class="kpi-unit">clientes únicos</div></div>
+    <div class="kpi-card ${pctDevolVsEmb<=metaDevolPct?'green':'danger'}"><div class="kpi-label">% Devolución vs Emb</div><div class="kpi-value">${fmt(pctDevolVsEmb,4)}</div><div class="kpi-unit">% — meta ≤${fmt(metaDevolPct,2)}%</div><div class="kpi-meta">En relación a tons embarcadas</div></div>
     <div class="kpi-card"><div class="kpi-label">SK</div><div class="kpi-value">${filteredDev.SK.length}</div><div class="kpi-unit">${fmt(sum(filteredDev.SK,'kilos'),0)} kg</div></div>
     <div class="kpi-card"><div class="kpi-label">Glama</div><div class="kpi-value">${filteredDev.Glama.length}</div><div class="kpi-unit">${fmt(sum(filteredDev.Glama,'kilos'),0)} kg</div></div>
     <div class="kpi-card"><div class="kpi-label">Desa</div><div class="kpi-value">${filteredDev.Desa.length}</div><div class="kpi-unit">${fmt(sum(filteredDev.Desa,'kilos'),0)} kg</div></div>`;
