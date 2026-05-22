@@ -1490,6 +1490,17 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
           <strong>m²:</strong> ${fmt((s.m2/s.diasProd),0)} m²/día → ${fmt(((s.m2/s.diasProd)*meta.diasLab),0)} ${((s.m2/s.diasProd)*meta.diasLab)>=meta.metaM2*1.05?'<span style="color:#00cc88;font-weight:700">🟢</span>':((s.m2/s.diasProd)*meta.diasLab)>=meta.metaM2*0.95?'<span style="color:var(--warn);font-weight:700">🟡</span>':'<span style="color:var(--danger);font-weight:700">🔴</span>'}
         </div>
       </div>
+      
+      <!-- FALTANTE PARA META -->
+      <div style="background:rgba(230,168,23,0.08);border:1px solid rgba(230,168,23,0.2);padding:10px;margin:8px 0 12px 0;border-radius:2px;font-family:var(--font-mono);font-size:8px;color:var(--text-muted);line-height:1.6;">
+        <div style="font-weight:700;margin-bottom:6px;color:var(--text-dim);">⚙️ FALTANTE PARA META (Faltan ${meta.diasLab - s.diasProd} días):</div>
+        <div style="margin-bottom:4px;">
+          <strong>Tons/día:</strong> ${fmt((meta.metaTons - s.tonEmb) / Math.max(1, meta.diasLab - s.diasProd))} kg/día
+        </div>
+        <div>
+          <strong>m²/día:</strong> ${fmt(((meta.metaM2 - s.m2) / Math.max(1, meta.diasLab - s.diasProd)),0)} m²/día
+        </div>
+      </div>
     </div>
     <div class="comp-card" style="border-color:rgba(230,168,23,0.25)">
       <div class="comp-title">📅 vs ${MESES[mesPrevNum]||mesPrevNum} ${anioPrev}</div>
