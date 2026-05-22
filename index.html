@@ -1158,16 +1158,24 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   const plantaUpper = planta.charAt(0).toUpperCase() + planta.slice(1); // 'sk' → 'Sk'... wait, mejor usa el mapa
   const plantaKey = { sk: 'SK', glama: 'Glama', desa: 'Desa' }[planta] || planta;
   const datosPrev = filtrarMesPrev(DATA[plantaKey] || []);
-  const sPrev     = calcStats(datosPrev);
+  
+  // Calcular manualmente sPrev en lugar de usar calcStats
+  const sPrev = {
+    tonEmb: datosPrev.reduce((sum, r) => sum + (r.tonEmb || 0), 0),
+    tonProd: datosPrev.reduce((sum, r) => sum + (r.tonProd || 0), 0),
+    m2: datosPrev.reduce((sum, r) => sum + (r.m2 || 0), 0),
+    pctTrim: datosPrev.length > 0 ? (datosPrev.reduce((sum, r) => sum + (r.mermaTrim || 0), 0) / (datosPrev.reduce((sum, r) => sum + (r.tonEmb || 0), 0) * 10)) : 0,
+    pctProc: datosPrev.length > 0 ? (datosPrev.reduce((sum, r) => sum + (r.mermaProc || 0), 0) / (datosPrev.reduce((sum, r) => sum + (r.tonProd || 0), 0) * 10)) : 0
+  };
   
   // DEBUG: Mostrar qué datos se usan para comparativo
   if (planta === 'sk') {
-    console.log(`📊 DEBUG ${planta.toUpperCase()} - MES ANTERIOR:`, {
+    console.log(`✅ COMPARATIVO MANUAL SK:`, {
       mes: mesPrevNum, anio: anioPrev, corte,
       registros: datosPrev.length,
-      tons: sPrev.tonEmb,
-      m2: sPrev.m2,
-      datos: datosPrev.slice(0,5).map(r => `${r.dia}/${r.mes}: ${r.tonEmb} tons`)
+      tons_prev: sPrev.tonEmb,
+      tons_actual: s.tonEmb,
+      delta_pct: sPrev.tonEmb > 0 ? (((s.tonEmb - sPrev.tonEmb) / sPrev.tonEmb) * 100).toFixed(1) : 'N/A'
     });
   }
 
