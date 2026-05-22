@@ -492,53 +492,6 @@ let DATA = { SK:{}, Glama:{}, Desa:{} };
 let METAS = { SK:[], Glama:[], Desa:[] };
 let DEVOLUCIONES = { SK:[], Glama:[], Desa:[] };
 
-// Plugin para mostrar % en gráficos
-const chartPluginPct = {
-  id: 'chartPluginPct',
-  afterDatasetsDraw(chart) {
-    const ctx = chart.ctx;
-    ctx.font = '11px IBM Plex Mono';
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    chart.data.datasets.forEach((dataset, datasetIdx) => {
-      const meta = chart.getDatasetMeta(datasetIdx);
-      
-      if (chart.config.type === 'doughnut' || chart.config.type === 'pie') {
-        // Para donas: mostrar % en cada segmento
-        const total = dataset.data.reduce((a,b)=>a+b,0);
-        meta.data.forEach((element, idx) => {
-          if (!element) return;
-          const pct = total>0 ? (dataset.data[idx]/total*100).toFixed(1) : 0;
-          const {x, y} = element.getProps(['x','y']);
-          const radius = element.outerRadius;
-          const angle = (element.startAngle + element.endAngle) / 2;
-          const labelRadius = radius * 0.65;
-          const labelX = x + Math.cos(angle - Math.PI/2) * labelRadius;
-          const labelY = y + Math.sin(angle - Math.PI/2) * labelRadius;
-          ctx.fillStyle = '#fff';
-          ctx.font = 'bold 12px IBM Plex Mono';
-          ctx.fillText(pct + '%', labelX, labelY);
-        });
-      } else if (chart.config.type === 'bar') {
-        // Para barras: mostrar % encima
-        meta.data.forEach((element, idx) => {
-          if (!element) return;
-          const total = dataset.data.reduce((a,b)=>a+b,0);
-          const pct = total>0 ? (dataset.data[idx]/total*100).toFixed(1) : 0;
-          const {x, y} = element.getProps(['x','y']);
-          ctx.fillStyle = '#333';
-          ctx.font = 'bold 10px IBM Plex Mono';
-          const yOffset = chart.config.options.indexAxis === 'y' ? x + 30 : y - 8;
-          const xOffset = chart.config.options.indexAxis === 'y' ? 10 : x;
-          ctx.fillText(pct + '%', xOffset, yOffset);
-        });
-      }
-    });
-  }
-};
-
 const hoy = new Date();
 const mesActual  = hoy.getMonth() + 1;
 const anioActual = hoy.getFullYear();
@@ -1055,7 +1008,6 @@ function renderResumen(filtered, filteredDev, metas) {
       datasets:[{ data:PLANTAS.map(p=>stats[p].tonEmb), backgroundColor:PLANTAS.map(p=>PLANTA_COLORS[p]), borderColor:'#fff', borderWidth:2 }]
     },
     options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ color:'#4a5568', font:{family:'IBM Plex Mono',size:10}, boxWidth:12 } } } },
-    plugins: [chartPluginPct]
   });
 
   destroyChart('chartResumenMermaTrim');
@@ -1069,7 +1021,6 @@ function renderResumen(filtered, filteredDev, metas) {
       ]
     },
     options: chartOpts('%'),
-    plugins: [chartPluginPct]
   });
 
   destroyChart('chartResumenMermaProc');
@@ -1083,7 +1034,6 @@ function renderResumen(filtered, filteredDev, metas) {
       ]
     },
     options: chartOpts('%'),
-    plugins: [chartPluginPct]
   });
 
   // Pareto devoluciones todas las plantas
@@ -1364,7 +1314,6 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
     options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ color:'#8892a4', font:{family:'IBM Plex Mono',size:10}, boxWidth:10 } },
       tooltip:{ callbacks:{ label:ctx=>{ const total=meta.metaTons; const pct=((ctx.parsed*100)/total).toFixed(1); return `${ctx.label}: ${fmt(ctx.raw)} kg (${pct}%)`; } } }
     }},
-    plugins: [chartPluginPct]
   });
 
   // Chart merma trim acumulado
@@ -1466,7 +1415,6 @@ function renderDevoluciones(filteredDev, filtered) {
         tooltip:{ callbacks:{ label:ctx=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); const pct=((ctx.parsed*100)/total).toFixed(1); return `${ctx.label}: ${ctx.parsed} (${pct}%)`; } } }
       } 
     },
-    plugins: [chartPluginPct]
   });
 
   // Chart por cliente (top 10 piezas)
@@ -1487,7 +1435,6 @@ function renderDevoluciones(filteredDev, filtered) {
         y:{ ticks:{ color:'#8892a4', font:{ family:'IBM Plex Mono', size:9 } }, grid:{ display:false } }
       }
     },
-    plugins: [chartPluginPct]
   });
   // Chart por planta
   destroyChart('chartDevolPlanta');
@@ -1502,7 +1449,6 @@ function renderDevoluciones(filteredDev, filtered) {
         tooltip:{ callbacks:{ label:ctx=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); const pct=((ctx.parsed*100)/total).toFixed(1); return `${ctx.label}: ${ctx.parsed} (${pct}%)`; } } }
       } 
     },
-    plugins: [chartPluginPct]
   });
 
   // Chart por día
