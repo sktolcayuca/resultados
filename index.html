@@ -1097,19 +1097,34 @@ function renderResumen(filtered, filteredDev, metas) {
   total.pctPagada = total.tonProd>0 ? total.mermaPagada/total.tonProd*100 : 0;
   total.pctProc   = total.tonProd>0 ? total.mermaProc/total.tonProd*100   : 0;
   
+  // Calcular promedio y estimado de TONS EMBARCADAS
+  const promTonsEmb = total.diasProd>0 ? total.tonEmb/total.diasProd : 0;
+  const metaTonsTotal = metas.SK.metaTons + metas.Glama.metaTons + metas.Desa.metaTons;
+  const estimadoTonsTotal = promTonsEmb * diasLabTotal;
+  const pctTonsTotal = metaTonsTotal>0 ? pct(total.tonEmb, metaTonsTotal) : 0;
+  
   // Calcular promedio y estimado de m²
   const promM2Diario = total.diasProd>0 ? total.m2/total.diasProd : 0;
   const diasLabTotal = metas.SK.diasLab + metas.Glama.diasLab + metas.Desa.diasLab; // Total días laborales para 3 plantas
   const estimadoM2Total = promM2Diario * diasLabTotal;
   const metaM2Total = metas.SK.metaM2 + metas.Glama.metaM2 + metas.Desa.metaM2;
   const pctM2Total = metaM2Total>0 ? pct(total.m2, metaM2Total) : 0;
+  
+  // Calcular faltante para meta (multiplanta)
+  const diaActual = new Date().getDate();
+  const diasRestantes = diasLabTotal - diaActual;
+  const faltanteTons = Math.max(0, metaTonsTotal - total.tonEmb);
+  const faltanteM2 = Math.max(0, metaM2Total - total.m2);
+  const tonsDiaFaltante = diasRestantes > 0 ? faltanteTons / diasRestantes : 0;
+  const m2DiaFaltante = diasRestantes > 0 ? faltanteM2 / diasRestantes : 0;
 
   // KPIs totales
   document.getElementById('kpiResumen').innerHTML = `
     <div class="kpi-card blue">
       <div class="kpi-label">Tons Embarcadas — TOTAL</div>
       <div class="kpi-value">${fmt(total.tonEmb)}</div>
-      <div class="kpi-unit">kg acumulados 3 plantas</div>
+      <div class="kpi-unit">kg acumulados 3 plantas — meta: ${fmt(metaTonsTotal,0)} kg</div>
+      <div class="kpi-meta"><strong>Prom/día:</strong> ${fmt(promTonsEmb,0)} kg<br><strong>Estimado mes:</strong> ${fmt(estimadoTonsTotal,0)} kg<br>${fmt(pctTonsTotal,1)}% de meta</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-label">Tons Producidas — TOTAL</div>
@@ -1152,6 +1167,18 @@ function renderResumen(filtered, filteredDev, metas) {
       <div class="kpi-label">Devoluciones — TOTAL</div>
       <div class="kpi-value">${total.devCount}</div>
       <div class="kpi-unit">${fmt(total.devKilos,0)} kg devueltos</div>
+    </div>
+    <div class="kpi-card" style="border-left:4px solid var(--warn);background:rgba(230,168,23,0.05)">
+      <div class="kpi-label" style="color:var(--warn);">⚙️ FALTANTE PARA META</div>
+      <div class="kpi-unit" style="margin-bottom:8px;">Faltan ${diasRestantes} días de ${diasLabTotal}</div>
+      <div class="kpi-meta">
+        <div style="margin-bottom:6px;">
+          <strong>Tons/día:</strong> <span style="color:var(--warn);font-weight:700">${fmt(tonsDiaFaltante,0)} kg/día</span>
+        </div>
+        <div>
+          <strong>m²/día:</strong> <span style="color:var(--warn);font-weight:700">${fmt(m2DiaFaltante,0)} m²/día</span>
+        </div>
+      </div>
     </div>`;
 
   // Cards por planta
