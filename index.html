@@ -175,15 +175,14 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
       </select>
     </div>
     <div class="filter-group">
-      <span class="filter-label">MES</span>
-      <select id="filterMes" onchange="applyFilters()">
-        <option value="all">Todos</option>
-        <option value="1">Enero</option><option value="2">Febrero</option>
-        <option value="3">Marzo</option><option value="4">Abril</option>
-        <option value="5">Mayo</option><option value="6">Junio</option>
-        <option value="7">Julio</option><option value="8">Agosto</option>
-        <option value="9">Septiembre</option><option value="10">Octubre</option>
-        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      <span class="filter-label">MES(ES)</span>
+      <select id="filterMes" onchange="applyFilters()" multiple style="min-height:80px;">
+        <option value="1" selected>Enero</option><option value="2" selected>Febrero</option>
+        <option value="3" selected>Marzo</option><option value="4" selected>Abril</option>
+        <option value="5" selected>Mayo</option><option value="6" selected>Junio</option>
+        <option value="7" selected>Julio</option><option value="8" selected>Agosto</option>
+        <option value="9" selected>Septiembre</option><option value="10" selected>Octubre</option>
+        <option value="11" selected>Noviembre</option><option value="12" selected>Diciembre</option>
       </select>
     </div>
     <div class="status-pill"><div class="status-dot"></div><span id="lastUpdate">CONECTANDO...</span></div>
@@ -368,7 +367,7 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
     <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;">
       <div class="filter-group">
         <label class="filter-label">PLANTA:</label>
-        <select id="filterPlantaDevoluciones" onchange="renderDevoluciones()">
+        <select id="filterPlantaDevoluciones" onchange="applyFilters()">
           <option value="ALL">TODAS</option>
           <option value="sk">SKarton</option>
           <option value="glama">GLAMA</option>
@@ -465,7 +464,7 @@ const GIDS = {
 };
 
 // Metas fijas de merma
-const META_TRIM_PCT = 3.5;
+const META_TRIM_PCT = 4;
 const META_PROC_PCT = 10.5;
 
 const MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -741,20 +740,30 @@ async function loadData() {
 // ═══════════════════════════════════════════════════════════════
 function applyFilters() {
   const anio   = parseInt(document.getElementById('filterAnio').value);
-  const mesVal = document.getElementById('filterMes').value;
-  const mesAll = mesVal === 'all';
-  const mes    = mesAll ? mesActual : parseInt(mesVal);
-  const esActual = !mesAll && (anio === anioActual && mes === mesActual);
-  // Corte: si es el mes/año actual → hasta hoy; si es pasado → día 31 (todos)
-  // Si mesAll → sin restricción de día (año completo)
-  const corte = mesAll ? 31 : (esActual ? diaCorte : 31);
+  const mesSelect = document.getElementById('filterMes');
+  const mesesSelected = Array.from(mesSelect.selectedOptions).map(opt => parseInt(opt.value));
+  
+  // Si no hay meses seleccionados, no hacer nada
+  if(mesesSelected.length === 0) return;
+  
+  const esMultiple = mesesSelected.length > 1;
+  const mes = esMultiple ? null : mesesSelected[0];
+  const esActual = !esMultiple && (anio === anioActual && mes === mesActual);
+  const corte = esMultiple ? 31 : (esActual ? diaCorte : 31);
 
-  document.getElementById('pBanner').textContent = mesAll ? `Todo ${anio}` : `${MESES[mes]} ${anio}`;
-  document.getElementById('pCorte').textContent  = mesAll ? 'Año completo' : `Día ${corte}${esActual?' (hoy)':''}`;
+  // Actualizar banner
+  if(esMultiple){
+    const mesesNom = mesesSelected.map(m=>MESES[m].substring(0,3)).join(', ');
+    document.getElementById('pBanner').textContent = `${mesesNom} ${anio}`;
+    document.getElementById('pCorte').textContent  = `${mesesSelected.length} meses`;
+  } else {
+    document.getElementById('pBanner').textContent = `${MESES[mes]} ${anio}`;
+    document.getElementById('pCorte').textContent  = `Día ${corte}${esActual?' (hoy)':''}`;
+  }
 
-  // Filtrar datos por planta
+  // Filtrar datos por planta Y por meses seleccionados
   const filtrar = (arr) => arr.filter(r =>
-    r.anio === anio && (mesAll || (r.mes === mes && r.dia <= corte))
+    r.anio === anio && mesesSelected.includes(r.mes) && r.dia <= corte
   );
 
   const filtered = {
@@ -764,7 +773,7 @@ function applyFilters() {
   };
 
   const filtrarDev = (arr) => arr.filter(r =>
-    r.anio === anio && (mesAll || (r.mes === mes && r.dia <= corte))
+    r.anio === anio && mesesSelected.includes(r.mes) && r.dia <= corte
   );
 
   const filteredDev = {
@@ -773,9 +782,21 @@ function applyFilters() {
     Desa:  filtrarDev(DEVOLUCIONES.Desa)
   };
 
-  const getMeta = (planta) =>
-    METAS[planta].find(m => m.mes === mes) ||
-    { metaTons:0, metaM2:0, metaMerma:0.105, diasLab:0 };
+  const getMeta = (planta) => {
+    if(esMultiple){
+      // Para múltiples meses, sumar metas
+      const metas = mesesSelected.map(m => METAS[planta].find(x=>x.mes===m) || {metaTons:0,metaM2:0,metaMerma:0.105,diasLab:0});
+      return {
+        metaTons: metas.reduce((s,m)=>s+m.metaTons,0),
+        metaM2: metas.reduce((s,m)=>s+m.metaM2,0),
+        metaMerma: metas.reduce((s,m)=>s+m.metaMerma,0)/metas.length,
+        diasLab: metas.reduce((s,m)=>s+m.diasLab,0)
+      };
+    } else {
+      return METAS[planta].find(m => m.mes === mes) ||
+             { metaTons:0, metaM2:0, metaMerma:0.105, diasLab:0 };
+    }
+  };
 
   const metas = {
     SK:    getMeta('SK'),
@@ -785,11 +806,11 @@ function applyFilters() {
 
   // Renderizar
   renderResumen(filtered, filteredDev, metas);
-  renderPlanta('SK',    filtered.SK,    filteredDev.SK,    metas.SK,    filtered, mes, anio, corte);
-  renderPlanta('Glama', filtered.Glama, filteredDev.Glama, metas.Glama, filtered, mes, anio, corte);
-  renderPlanta('Desa',  filtered.Desa,  filteredDev.Desa,  metas.Desa,  filtered, mes, anio, corte);
+  renderPlanta('SK',    filtered.SK,    filteredDev.SK,    metas.SK,    filtered, mes || mesesSelected[0], anio, corte);
+  renderPlanta('Glama', filtered.Glama, filteredDev.Glama, metas.Glama, filtered, mes || mesesSelected[0], anio, corte);
+  renderPlanta('Desa',  filtered.Desa,  filteredDev.Desa,  metas.Desa,  filtered, mes || mesesSelected[0], anio, corte);
   renderDevoluciones(filteredDev);
-  renderTablaDiario(mes, anio, corte);
+  renderTablaDiario(mes || mesesSelected[0], anio, corte);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1305,7 +1326,19 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
 // RENDER DEVOLUCIONES
 // ═══════════════════════════════════════════════════════════════
 function renderDevoluciones(filteredDev) {
-  const allDev = [...filteredDev.SK,...filteredDev.Glama,...filteredDev.Desa];
+  // Obtener el filtro de planta del dropdown
+  const plantaFilter = document.getElementById('filterPlantaDevoluciones')?.value || 'ALL';
+  
+  // Filtrar devoluciones según la planta seleccionada
+  let allDev = [];
+  if(plantaFilter === 'ALL'){
+    allDev = [...filteredDev.SK,...filteredDev.Glama,...filteredDev.Desa];
+  } else {
+    const plantaMap = {sk:'SK', glama:'Glama', desa:'Desa'};
+    const plantaKey = plantaMap[plantaFilter] || plantaFilter;
+    allDev = filteredDev[plantaKey] || [];
+  }
+  
   const totalCount  = allDev.length;
   const totalPiezas = sum(allDev,'piezas');
   const totalKilos  = sum(allDev,'kilos');
