@@ -1389,8 +1389,8 @@ function renderDevoluciones(filteredDev, filtered) {
   const clientes    = new Set(allDev.map(r=>r.cliente)).size;
   
   // Calcular % devolución vs embarcado
-  const totalTonsEmb = sum(allProd,'tonEmb');
-  const pctDevolVsEmb = totalTonsEmb > 0 ? (totalKilos/1000) / totalTonsEmb * 100 : 0;
+  const totalTonsEmb = sum(allProd,'tonEmb') / 1000; // Convertir de kg a tons
+  const pctDevolVsEmb = totalTonsEmb > 0 ? ((totalKilos/1000) / totalTonsEmb) * 100 : 0;
   
   // Meta según planta seleccionada
   const plantaMap = {sk:'SK', glama:'Glama', desa:'Desa'};
