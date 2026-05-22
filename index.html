@@ -1157,6 +1157,17 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
   );
   const datosPrev = filtrarMesPrev(DATA[planta]);
   const sPrev     = calcStats(datosPrev);
+  
+  // DEBUG: Mostrar qué datos se usan para comparativo
+  if (planta === 'sk') {
+    console.log(`📊 DEBUG ${planta.toUpperCase()} - MES ANTERIOR:`, {
+      mes: mesPrevNum, anio: anioPrev, corte,
+      registros: datosPrev.length,
+      tons: sPrev.tonEmb,
+      m2: sPrev.m2,
+      datos: datosPrev.slice(0,5).map(r => `${r.dia}/${r.mes}: ${r.tonEmb} tons`)
+    });
+  }
 
   // KPIs producción
   const avance = meta.metaTons>0 ? pct(s.tonEmb,meta.metaTons) : 0;
