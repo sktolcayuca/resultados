@@ -922,13 +922,27 @@ function renderResumen(filtered, filteredDev, metas) {
       <div class="kpi-label">% Merma Trim — TOTAL</div>
       <div class="kpi-value">${fmt(total.pctTrim,2)}</div>
       <div class="kpi-unit">% — meta ≤${META_TRIM_PCT}%</div>
+      <div class="kpi-meta"><strong>${fmt(total.mermaTrim,0)}</strong> kg trim</div>
       <div class="progress-track"><div class="progress-fill ${total.pctTrim<=META_TRIM_PCT?'green':'danger'}" style="width:${Math.min(pct(total.pctTrim,META_TRIM_PCT),150)}%"></div></div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">% Merma Pagada — TOTAL</div>
+      <div class="kpi-value">${fmt(total.pctPagada,2)}</div>
+      <div class="kpi-unit">% sobre producción</div>
+      <div class="kpi-meta"><strong>${fmt(total.mermaPagada,0)}</strong> kg pagados</div>
     </div>
     <div class="kpi-card ${total.pctProc<=META_PROC_PCT?'green':'danger'}">
       <div class="kpi-label">% Merma Proceso — TOTAL</div>
       <div class="kpi-value">${fmt(total.pctProc,2)}</div>
       <div class="kpi-unit">% — meta ≤${META_PROC_PCT}%</div>
+      <div class="kpi-meta"><strong>${fmt(total.mermaProc,0)}</strong> kg proceso</div>
       <div class="progress-track"><div class="progress-fill ${total.pctProc<=META_PROC_PCT?'green':'danger'}" style="width:${Math.min(pct(total.pctProc,META_PROC_PCT),150)}%"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">% Merma Total — TOTAL</div>
+      <div class="kpi-value">${fmt(total.pctPagada+total.pctProc,2)}</div>
+      <div class="kpi-unit">Pagada + Proceso</div>
+      <div class="kpi-meta"><strong>${fmt(total.mermaPagada+total.mermaProc,0)}</strong> kg totales</div>
     </div>
     <div class="kpi-card danger">
       <div class="kpi-label">Devoluciones — TOTAL</div>
@@ -1142,46 +1156,56 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
       <div class="kpi-unit">de ${datos.length} días en período</div>
     </div>`;
 
-  // KPIs merma
+  // KPIs merma — NUEVO ORDEN: Trim%, Trim kg, Pagada%, Proceso%, Total%, M2
   const dTrim = s.pctTrim - META_TRIM_PCT;
   const dProc = s.pctProc - META_PROC_PCT;
+  
+  // M2: promedio diario y estimado (como Tons Embarcadas)
+  const promM2Diario = s.diasProd>0 ? s.m2/s.diasProd : 0;
+  const estimadoM2 = promM2Diario * (meta.diasLab || 22);
+  const pctM2 = meta.metaM2>0 ? pct(s.m2,meta.metaM2) : 0;
+  
+  // Merma Total = Pagada + Proceso (sin Trim)
+  const pctMermaTotal = s.pctPagada + s.pctProc;
+  const mermaTotalKg = s.mermaPagada + s.mermaProc;
+  
   document.getElementById(`kpiMerma${id}`).innerHTML = `
     <div class="kpi-card ${s.pctTrim<=META_TRIM_PCT?'green':'danger'}">
       <div class="kpi-label">% Merma Trim</div>
       <div class="kpi-value">${fmt(s.pctTrim,2)}</div>
       <div class="kpi-unit">% — meta ≤${META_TRIM_PCT}%</div>
+      <div class="kpi-meta"><strong>${fmt(s.mermaTrim,0)}</strong> kg trim</div>
       <div class="progress-track"><div class="progress-fill ${s.pctTrim<=META_TRIM_PCT?'green':'danger'}" style="width:${Math.min(pct(s.pctTrim,META_TRIM_PCT),150)}%"></div></div>
-      <div class="kpi-meta ${dTrim<=0?'up':'down'}">${dTrim>0?'▲':'▼'} ${fmt(Math.abs(dTrim),2)}pp vs meta</div>
-    </div>
-    <div class="kpi-card ${s.pctProc<=META_PROC_PCT?'green':'danger'}">
-      <div class="kpi-label">% Merma Proceso</div>
-      <div class="kpi-value">${fmt(s.pctProc,2)}</div>
-      <div class="kpi-unit">% — meta ≤${META_PROC_PCT}%</div>
-      <div class="progress-track"><div class="progress-fill ${s.pctProc<=META_PROC_PCT?'green':'danger'}" style="width:${Math.min(pct(s.pctProc,META_PROC_PCT),150)}%"></div></div>
-      <div class="kpi-meta ${dProc<=0?'up':'down'}">${dProc>0?'▲':'▼'} ${fmt(Math.abs(dProc),2)}pp vs meta</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-label">% Merma Pagada</div>
       <div class="kpi-value">${fmt(s.pctPagada,2)}</div>
       <div class="kpi-unit">% sobre producción</div>
-      <div class="kpi-meta neutral">${fmt(s.mermaPagada,0)} kg pagados</div>
+      <div class="kpi-meta"><strong>${fmt(s.mermaPagada,0)}</strong> kg pagados</div>
     </div>
-    <div class="kpi-card ${s.pctTotal<=(META_TRIM_PCT+META_PROC_PCT)?'green':'warn'}">
+    <div class="kpi-card ${s.pctProc<=META_PROC_PCT?'green':'danger'}">
+      <div class="kpi-label">% Merma Proceso</div>
+      <div class="kpi-value">${fmt(s.pctProc,2)}</div>
+      <div class="kpi-unit">% — meta ≤${META_PROC_PCT}%</div>
+      <div class="kpi-meta"><strong>${fmt(s.mermaProc,0)}</strong> kg proceso</div>
+      <div class="progress-track"><div class="progress-fill ${s.pctProc<=META_PROC_PCT?'green':'danger'}" style="width:${Math.min(pct(s.pctProc,META_PROC_PCT),150)}%"></div></div>
+    </div>
+    <div class="kpi-card ${pctMermaTotal<=(META_PROC_PCT)?'green':'warn'}">
       <div class="kpi-label">% Merma Total</div>
-      <div class="kpi-value">${fmt(s.pctTotal,2)}</div>
-      <div class="kpi-unit">Trim + Proceso</div>
-      <div class="kpi-meta neutral">${fmt(s.mermaTotal,0)} kg totales</div>
+      <div class="kpi-value">${fmt(pctMermaTotal,2)}</div>
+      <div class="kpi-unit">Pagada + Proceso</div>
+      <div class="kpi-meta"><strong>${fmt(mermaTotalKg,0)}</strong> kg totales</div>
     </div>
-    <div class="kpi-card orange">
-      <div class="kpi-label">Merma Trim (kg)</div>
-      <div class="kpi-value">${fmt(s.mermaTrim,0)}</div>
-      <div class="kpi-unit">kg de trim</div>
+    <div class="kpi-card">
+      <div class="kpi-label">m² Producidos</div>
+      <div class="kpi-value">${fmt(s.m2,0)}</div>
+      <div class="kpi-unit">m² — meta: ${fmt(meta.metaM2,0)} m²</div>
+      <div class="kpi-meta">
+        <div><strong>Prom/día:</strong> ${fmt(promM2Diario,0)} m²</div>
+        <div><strong>Estimado mes:</strong> ${fmt(estimadoM2,0)} m²</div>
+        <div style="margin-top:4px;">${fmt(pctM2,1)}% de meta</div>
+      </div>
     </div>
-    <div class="kpi-card warn">
-      <div class="kpi-label">Merma Proceso (kg)</div>
-      <div class="kpi-value">${fmt(s.mermaProc,0)}</div>
-      <div class="kpi-unit">kg de proceso</div>
-    </div>`;
 
   // Comparativo mes anterior
   const dE  = delta(s.tonEmb,  sPrev.tonEmb);
@@ -1279,7 +1303,7 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
       datasets:[{ data:[s.tonEmb, Math.max(meta.metaTons-s.tonEmb,0)], backgroundColor:[PLANTA_COLORS[planta],'#e8ecf4'], borderColor:[PLANTA_COLORS[planta],'#e8ecf4'], borderWidth:1 }]
     },
     options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ color:'#8892a4', font:{family:'IBM Plex Mono',size:10}, boxWidth:10 } },
-      tooltip:{ callbacks:{ label:ctx=>`${ctx.label}: ${fmt(ctx.raw)} kg` } }
+      tooltip:{ callbacks:{ label:ctx=>{ const total=meta.metaTons; const pct=((ctx.parsed*100)/total).toFixed(1); return `${ctx.label}: ${fmt(ctx.raw)} kg (${pct}%)`; } } }
     }}
   });
 
@@ -1365,7 +1389,12 @@ function renderDevoluciones(filteredDev) {
   CHARTS.chartDevolDepto = new Chart(document.getElementById('chartDevolDepto'),{
     type:'doughnut',
     data:{ labels:sortedResp.map(e=>e[0]), datasets:[{ data:sortedResp.map(e=>e[1]), backgroundColor:colorsD, borderColor:'#fff', borderWidth:2 }] },
-    options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ color:'#8892a4', font:{family:'IBM Plex Mono',size:9}, boxWidth:10, padding:8 } } } }
+    options:{ responsive:true, 
+      plugins:{ 
+        legend:{ position:'bottom', labels:{ color:'#8892a4', font:{family:'IBM Plex Mono',size:9}, boxWidth:10, padding:8 } },
+        tooltip:{ callbacks:{ label:ctx=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); const pct=((ctx.parsed*100)/total).toFixed(1); return `${ctx.label}: ${ctx.parsed} (${pct}%)`; } } }
+      } 
+    }
   });
 
   // Chart por cliente (top 10 piezas)
@@ -1395,7 +1424,12 @@ function renderDevoluciones(filteredDev) {
     data:{ labels:PLANTAS.map(p=>PLANTA_LABELS[p]),
       datasets:[{ data:PLANTAS.map(p=>filteredDev[p].length), backgroundColor:PLANTAS.map(p=>PLANTA_COLORS[p]), borderColor:'#fff', borderWidth:2 }]
     },
-    options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ color:'#8892a4', font:{family:'IBM Plex Mono',size:10}, boxWidth:10 } } } }
+    options:{ responsive:true, 
+      plugins:{ 
+        legend:{ position:'bottom', labels:{ color:'#8892a4', font:{family:'IBM Plex Mono',size:10}, boxWidth:10 } },
+        tooltip:{ callbacks:{ label:ctx=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); const pct=((ctx.parsed*100)/total).toFixed(1); return `${ctx.label}: ${ctx.parsed} (${pct}%)`; } } }
+      } 
+    }
   });
 
   // Chart por día
