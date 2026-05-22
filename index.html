@@ -971,6 +971,7 @@ function renderResumen(filtered, filteredDev, metas) {
     const s = stats[p];
     const m = metas[p];
     const avance = m.metaTons>0 ? pct(s.tonEmb,m.metaTons) : 0;
+    const pct2 = m.metaM2>0 ? pct(s.m2,m.metaM2) : 0;
     const dv = filteredDev[p];
     return `<div class="planta-card" style="border-top:3px solid ${PLANTA_COLORS[p]}">
       <div class="planta-card-title" style="color:${PLANTA_COLORS[p]}">${PLANTA_LABELS[p]}</div>
