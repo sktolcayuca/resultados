@@ -383,7 +383,7 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
         <canvas id="chartDevolDepto"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Top Clientes — Piezas devueltas <span class="chart-tag">BARRAS</span></div>
+        <div class="chart-title">Top Clientes — Toneladas devueltas <span class="chart-tag">BARRAS</span></div>
         <canvas id="chartDevolCliente"></canvas>
       </div>
     </div>
@@ -1365,15 +1365,23 @@ function renderDevoluciones(filteredDev, filtered) {
   // Filtrar devoluciones según la planta seleccionada
   let allDev = [];
   let allProd = [];
+  let plantaLabel = 'Todas las Plantas';
+  
   if(plantaFilter === 'ALL'){
     allDev = [...filteredDev.SK,...filteredDev.Glama,...filteredDev.Desa];
     allProd = [...(filtered?.SK||[]),...(filtered?.Glama||[]),...(filtered?.Desa||[])];
+    plantaLabel = 'Todas las Plantas';
   } else {
     const plantaMap = {sk:'SK', glama:'Glama', desa:'Desa'};
+    const labelMap = {sk:'SKarton', glama:'GLAMA', desa:'DESA'};
     const plantaKey = plantaMap[plantaFilter] || plantaFilter;
     allDev = filteredDev[plantaKey] || [];
     allProd = filtered ? (filtered[plantaKey] || []) : [];
+    plantaLabel = labelMap[plantaFilter] || 'Todas las Plantas';
   }
+  
+  // Actualizar label
+  document.getElementById('devolPlantaLabel').textContent = plantaLabel;
   
   const totalCount  = allDev.length;
   const totalPiezas = sum(allDev,'piezas');
@@ -1385,6 +1393,7 @@ function renderDevoluciones(filteredDev, filtered) {
   const pctDevolVsEmb = totalTonsEmb > 0 ? (totalKilos/1000) / totalTonsEmb * 100 : 0;
   
   // Meta según planta seleccionada
+  const plantaMap = {sk:'SK', glama:'Glama', desa:'Desa'};
   const metaDevolPct = plantaFilter === 'ALL' ? 0.95 : (META_DEVOL_PCT[plantaMap[plantaFilter]] || 1.0);
 
   document.getElementById('kpiDevol').innerHTML = `
