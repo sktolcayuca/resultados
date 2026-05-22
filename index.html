@@ -1125,7 +1125,6 @@ function renderResumen(filtered, filteredDev, metas, mes, anio, corte) {
       <div class="kpi-label">Tons Embarcadas — TOTAL</div>
       <div class="kpi-value">${fmt(total.tonEmb)}</div>
       <div class="kpi-unit">kg acumulados 3 plantas — meta: ${fmt(metaTonsTotal,0)} kg</div>
-      <div class="kpi-meta"><strong>Prom/día:</strong> ${fmt(promTonsEmb,0)} kg<br><strong>Estimado mes:</strong> ${fmt(estimadoTonsTotal,0)} kg<br>${fmt(pctTonsTotal,1)}% de meta</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-label">Tons Producidas — TOTAL</div>
@@ -1136,7 +1135,6 @@ function renderResumen(filtered, filteredDev, metas, mes, anio, corte) {
       <div class="kpi-label">m² Producidos — TOTAL</div>
       <div class="kpi-value">${fmt(total.m2,0)}</div>
       <div class="kpi-unit">m² — meta: ${fmt(metaM2Total,0)} m²</div>
-      <div class="kpi-meta"><strong>Prom/día:</strong> ${fmt(promM2Diario,0)} m²<br><strong>Estimado mes:</strong> ${fmt(estimadoM2Total,0)} m²<br>${fmt(pctM2Total,1)}% de meta</div>
     </div>
     <div class="kpi-card ${total.pctTrim<=META_TRIM_PCT?'green':'danger'}">
       <div class="kpi-label">% Merma Trim — TOTAL</div>
