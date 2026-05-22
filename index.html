@@ -263,6 +263,29 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:2px;">DASHBOARD OPERATIVO · PRODUCCIÓN Y MERMA</div>
       </div>
     </div>
+    <div id="mejorMesSK" class="mejor-mes-card" style="display:none;margin-bottom:18px;padding:18px;background:linear-gradient(135deg,rgba(0,102,204,0.08) 0%,rgba(0,153,204,0.04) 100%);border:1px solid rgba(0,102,204,0.2);border-radius:8px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <span style="font-size:24px;">🏆</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;">MEJOR MES EN HISTÓRICO</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">TONS EMBARCADAS</div>
+          <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:var(--accent);" id="mejorMesSK_ton">—</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);" id="mejorMesSK_ton_anio">—</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">m² PRODUCIDOS</div>
+          <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:var(--accent);" id="mejorMesSK_m2">—</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);" id="mejorMesSK_m2_anio">—</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">DEVOLUCIONES</div>
+          <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:#ff6b35;" id="mejorMesSK_devol">—</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);" id="mejorMesSK_devol_anio">—</div>
+        </div>
+      </div>
+    </div>
     <div class="section-title">📦 Skarton Planta Tolcayuca — Producción</div>
     <div class="kpi-grid" id="kpiSK"></div>
     <div class="section-title">Merma — Skarton</div>
@@ -299,6 +322,29 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8892a4;letter-spacing:2px;">DASHBOARD OPERATIVO · PRODUCCIÓN Y MERMA</div>
       </div>
     </div>
+    <div id="mejorMesGlama" class="mejor-mes-card" style="display:none;margin-bottom:18px;padding:18px;background:linear-gradient(135deg,rgba(0,204,136,0.08) 0%,rgba(0,204,136,0.04) 100%);border:1px solid rgba(0,204,136,0.2);border-radius:8px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <span style="font-size:24px;">🏆</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;">MEJOR MES EN HISTÓRICO</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">TONS EMBARCADAS</div>
+          <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:#00cc88;" id="mejorMesGlama_ton">—</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);" id="mejorMesGlama_ton_anio">—</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">m² PRODUCIDOS</div>
+          <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:#00cc88;" id="mejorMesGlama_m2">—</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);" id="mejorMesGlama_m2_anio">—</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">DEVOLUCIONES</div>
+          <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:#ff6b35;" id="mejorMesGlama_devol">—</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);" id="mejorMesGlama_devol_anio">—</div>
+        </div>
+      </div>
+    </div>
     <div class="section-title">🟦 Glama — Producción</div>
     <div class="kpi-grid" id="kpiGlama"></div>
     <div class="section-title">Merma — Glama</div>
@@ -333,6 +379,29 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
       <div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#ff6b35;">DESA</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8892a4;letter-spacing:2px;">DASHBOARD OPERATIVO · PRODUCCIÓN Y MERMA</div>
+      </div>
+    </div>
+    <div id="mejorMesDesa" class="mejor-mes-card" style="display:none;margin-bottom:18px;padding:18px;background:linear-gradient(135deg,rgba(255,107,53,0.08) 0%,rgba(255,107,53,0.04) 100%);border:1px solid rgba(255,107,53,0.2);border-radius:8px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <span style="font-size:24px;">🏆</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;">MEJOR MES EN HISTÓRICO</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">TONS EMBARCADAS</div>
+          <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:#ff6b35;" id="mejorMesDesa_ton">—</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);" id="mejorMesDesa_ton_anio">—</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">m² PRODUCIDOS</div>
+          <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:#ff6b35;" id="mejorMesDesa_m2">—</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);" id="mejorMesDesa_m2_anio">—</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">DEVOLUCIONES</div>
+          <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:#ff6b35;" id="mejorMesDesa_devol">—</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);" id="mejorMesDesa_devol_anio">—</div>
+        </div>
       </div>
     </div>
     <div class="section-title">🟧 Desa — Producción</div>
@@ -592,6 +661,119 @@ function parseDatos(rows) {
   return result;
 }
 
+// ===== LECTURA DE HISTÓRICOS =====
+async function cargarHistoricos() {
+  const historicos = {
+    SK: { ton: '1840784743', m2: '824452920', devol: '351757230' },
+    Desa: { ton: '98750911', m2: '349434830', devol: '129172690' },
+    Glama: { ton: '477059060', m2: '1388158015', devol: '563570544' }
+  };
+  
+  const HIST = {};
+  
+  for (const [planta, gids] of Object.entries(historicos)) {
+    HIST[planta] = {};
+    
+    // Cargar TON
+    try {
+      const urlTon = `https://docs.google.com/spreadsheets/d/1G_zCNp3ZMUkc2TF1eAopTDnGC07d8p_zOFUaiKcveIY/export?format=csv&gid=${gids.ton}`;
+      const resTon = await fetch(urlTon);
+      const csvTon = await resTon.text();
+      HIST[planta].ton = parseHistorico(csvTon);
+    } catch(e) { console.warn(`Error cargando TON ${planta}:`, e); }
+    
+    // Cargar m2
+    try {
+      const urlM2 = `https://docs.google.com/spreadsheets/d/1G_zCNp3ZMUkc2TF1eAopTDnGC07d8p_zOFUaiKcveIY/export?format=csv&gid=${gids.m2}`;
+      const resM2 = await fetch(urlM2);
+      const csvM2 = await resM2.text();
+      HIST[planta].m2 = parseHistorico(csvM2);
+    } catch(e) { console.warn(`Error cargando m2 ${planta}:`, e); }
+    
+    // Cargar DEVOL
+    try {
+      const urlDevol = `https://docs.google.com/spreadsheets/d/1G_zCNp3ZMUkc2TF1eAopTDnGC07d8p_zOFUaiKcveIY/export?format=csv&gid=${gids.devol}`;
+      const resDevol = await fetch(urlDevol);
+      const csvDevol = await resDevol.text();
+      HIST[planta].devol = parseHistorico(csvDevol);
+    } catch(e) { console.warn(`Error cargando DEVOL ${planta}:`, e); }
+  }
+  
+  return HIST;
+}
+
+function parseHistorico(csv) {
+  const lines = csv.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim());
+  const result = {};
+  
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split(',').map(p => p.trim());
+    if (!parts[0]) continue;
+    
+    const anio = parseInt(parts[0]);
+    result[anio] = {};
+    
+    // Mapear meses: Ene=1, Feb=2, ..., Dic=12
+    for (let j = 0; j < 12; j++) {
+      result[anio][j+1] = parseNum(parts[j+1]); // j+1 porque j=0 es enero (mes 1)
+    }
+  }
+  
+  return result;
+}
+
+function mejorMes(historico, mes) {
+  if (!historico) return null;
+  
+  let mejor = null;
+  let maxValor = 0;
+  let mejorAnio = null;
+  
+  for (const [anio, datos] of Object.entries(historico)) {
+    const valor = datos[mes] || 0;
+    if (valor > maxValor) {
+      maxValor = valor;
+      mejor = valor;
+      mejorAnio = parseInt(anio);
+    }
+  }
+  
+  return { valor: mejor, anio: mejorAnio };
+}
+
+function poblarMejorMes(HIST, mes) {
+  const plantas = ['SK', 'Glama', 'Desa'];
+  
+  plantas.forEach(planta => {
+    const mejorTon = mejorMes(HIST[planta]?.ton, mes);
+    const mejorM2 = mejorMes(HIST[planta]?.m2, mes);
+    const mejorDevol = mejorMes(HIST[planta]?.devol, mes);
+    
+    const elementId = `mejorMes${planta}`;
+    const container = document.getElementById(elementId);
+    
+    if (container && (mejorTon || mejorM2 || mejorDevol)) {
+      container.style.display = 'grid';
+      
+      if (mejorTon) {
+        document.getElementById(`${elementId}_ton`).textContent = fmt(mejorTon.valor, 0);
+        document.getElementById(`${elementId}_ton_anio`).textContent = `${MESES[mes]} ${mejorTon.anio}`;
+      }
+      if (mejorM2) {
+        document.getElementById(`${elementId}_m2`).textContent = fmt(mejorM2.valor, 0);
+        document.getElementById(`${elementId}_m2_anio`).textContent = `${MESES[mes]} ${mejorM2.anio}`;
+      }
+      if (mejorDevol) {
+        document.getElementById(`${elementId}_devol`).textContent = fmt(mejorDevol.valor, 0);
+        document.getElementById(`${elementId}_devol_anio`).textContent = `${MESES[mes]} ${mejorDevol.anio}`;
+      }
+    }
+  });
+  
+  console.log('✅ Cuadros de Mejor Mes poblados', HIST);
+}
+
 // Estructura devoluciones (imagen 3):
 // Col 0: Fecha  1: Planta  2: Cliente  3: Pedido  4: Piezas  5: Kilos
 // Col 6: Implicado  7: Motivo  8: Autoriza  9: Costos asociados
@@ -724,6 +906,12 @@ async function loadData() {
     document.getElementById('footerTs').textContent   = `FETCH: ${now.toLocaleString('es-MX')}`;
 
     applyFilters();
+    
+    // Cargar Históricos para cuadros de "Mejor Mes"
+    document.getElementById('loadingMsg').textContent = 'CARGANDO HISTÓRICOS...';
+    const HIST = await cargarHistoricos();
+    poblarMejorMes(HIST, mesActual);
+    
     // Setear logos en tabs de planta
     if (typeof PLANTA_LOGOS !== 'undefined') {
       const logoTabSK    = document.getElementById('logoTabSK');
