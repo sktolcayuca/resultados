@@ -979,11 +979,17 @@ function renderResumen(filtered, filteredDev, metas) {
       <div class="planta-stat"><span class="planta-stat-label">m² Producidos</span><span class="planta-stat-val">${fmt(s.m2,0)}</span></div>
       <div class="planta-stat"><span class="planta-stat-label">Avance vs Meta</span><span class="planta-stat-val ${avance>=100?'up':avance>=75?'neutral':'down'}">${fmt(avance,1)}% (meta ${fmt(m.metaTons)} kg)</span></div>
       
-      <!-- PACE OF PLAY - LO QUE FALTA -->
-      <div style="background:rgba(214,48,49,0.08);border:1px solid rgba(214,48,49,0.2);padding:10px;margin:8px 0;border-radius:2px;font-family:var(--font-mono);font-size:8px;color:var(--text-muted);line-height:1.5;">
-        <div style="font-weight:700;margin-bottom:4px;color:var(--text-dim);">⚠️ POR EMBARCAR:</div>
-        <div>Tons: <span style="color:var(--danger);font-weight:700;">${fmt(m.metaTons - s.tonEmb)}</span> (${fmt(((m.metaTons - s.tonEmb)/m.metaTons)*100,1)}%)</div>
-        <div style="margin-top:4px;">m²: <span style="color:var(--danger);font-weight:700;">${fmt((m.metaM2 - s.m2),0)}</span> (${fmt(((m.metaM2 - s.m2)/m.metaM2)*100,1)}%)</div>
+      <!-- AVANCE vs META -->
+      <div style="background:rgba(0,102,204,0.08);border:1px solid rgba(0,102,204,0.2);padding:10px;margin:8px 0;border-radius:2px;font-family:var(--font-mono);font-size:8px;color:var(--text-muted);line-height:1.5;">
+        <div style="font-weight:700;margin-bottom:4px;color:var(--text-dim);">Tons Embarcadas</div>
+        <div style="font-size:18px;color:var(--text);font-weight:700;margin-bottom:2px;">${fmt(avance,1)}%</div>
+        <div style="font-size:8px;color:var(--text-muted);">${fmt(s.tonEmb)} / ${fmt(m.metaTons)} kg</div>
+      </div>
+      
+      <div style="background:rgba(0,102,204,0.08);border:1px solid rgba(0,102,204,0.2);padding:10px;margin:8px 0;border-radius:2px;font-family:var(--font-mono);font-size:8px;color:var(--text-muted);line-height:1.5;">
+        <div style="font-weight:700;margin-bottom:4px;color:var(--text-dim);">m² Producidos</div>
+        <div style="font-size:18px;color:var(--text);font-weight:700;margin-bottom:2px;">${fmt(pct2,1)}%</div>
+        <div style="font-size:8px;color:var(--text-muted);">${fmt(s.m2,0)} / ${fmt(m.metaM2,0)} m²</div>
       </div>
       
       <div class="planta-stat"><span class="planta-stat-label">% Merma Trim</span><span class="planta-stat-val"><span class="chip ${chipM(s.pctTrim,META_TRIM_PCT)}">${fmt(s.pctTrim,2)}%</span></span></div>
@@ -1258,13 +1264,6 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
       
       ${compRow('Tons Embarcadas', s.tonEmb, `meta ${fmt(meta.metaTons)} kg`, { txt: fmt(avance,1)+'%', cls: avance>=90?'pos':avance>=70?'neu':'neg' })}
       ${compRow('m² Producidos',   s.m2,     `meta ${fmt(meta.metaM2,0)} m²`, delta(s.m2, meta.metaM2))}
-      
-      <!-- POR EMBARCAR - Texto simple -->
-      <div style="padding:8px 0;border-top:1px solid rgba(0,0,0,0.05);margin-top:8px;font-family:var(--font-mono);font-size:8px;color:var(--text-muted);line-height:1.5;">
-        <div style="color:var(--danger);font-weight:700;margin-bottom:4px;">⚠️ POR EMBARCAR:</div>
-        <div>Tons: ${fmt(meta.metaTons - s.tonEmb)} (${fmt(((meta.metaTons - s.tonEmb)/meta.metaTons)*100,1)}%)</div>
-        <div>m²: ${fmt((meta.metaM2 - s.m2),0)} (${fmt(((meta.metaM2 - s.m2)/meta.metaM2)*100,1)}%)</div>
-      </div>
     </div>
     <div class="comp-card" style="border-color:rgba(230,168,23,0.25)">
       <div class="comp-title">📅 vs ${MESES[mesPrevNum]||mesPrevNum} ${anioPrev}</div>
