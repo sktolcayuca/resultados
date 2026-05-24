@@ -1078,7 +1078,7 @@ function calcStats(arr) {
   const mermaPagada = sum(arr,'mermaPagada');
   const mermaProc   = sum(arr,'mermaProc');
   const mermaTotal  = mermaTrim + mermaProc;
-  const diasProd    = arr.filter(r=>r.tonProd>0).length;
+  const diasProd    = arr.filter(r=>r.tonEmb>0).length; // Cambiar a tonEmb (embarques), no tonProd
   const pctTrim     = tonProd>0 ? mermaTrim/tonProd*100   : 0;
   const pctPagada   = tonProd>0 ? mermaPagada/tonProd*100 : 0;
   const pctProc     = tonProd>0 ? mermaProc/tonProd*100   : 0;
