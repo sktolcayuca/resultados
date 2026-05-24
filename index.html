@@ -1485,10 +1485,10 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
       <div class="kpi-unit">m² — meta: ${fmt(meta.metaM2,0)} m²</div>
       <div class="kpi-meta"><strong>Prom/día:</strong> ${fmt(promM2Diario,0)} m²<br><strong>Estimado mes:</strong> ${fmt(estimadoM2,0)} m²<br>${fmt(pctM2,1)}% de meta</div>
     </div>
-    <div class="kpi-card ${s.diasProd/Math.max(datos.length,1)>=0.8?'green':'warn'}">
+    <div class="kpi-card ${s.diasProd/Math.max(meta.diasLab,1)>=0.8?'green':'warn'}">
       <div class="kpi-label">Días Productivos</div>
       <div class="kpi-value">${s.diasProd}</div>
-      <div class="kpi-unit">de ${datos.length} días en período</div>
+      <div class="kpi-unit">de ${meta.diasLab} días en período</div>
     </div>`;
 
   // KPIs merma — NUEVO ORDEN: Trim%, Trim kg, Pagada%, Proceso%, Total%
