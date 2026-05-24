@@ -909,9 +909,7 @@ async function loadData() {
     document.getElementById('pCarga').textContent     = now.toLocaleString('es-MX');
     document.getElementById('footerTs').textContent   = `FETCH: ${now.toLocaleString('es-MX')}`;
 
-    applyFilters();
-    
-    // Cargar Históricos para cuadros de "Mejor Mes"
+    // Cargar Históricos PRIMERO antes de renderizar
     document.getElementById('loadingMsg').textContent = 'CARGANDO HISTÓRICOS...';
     try {
       window.HIST = await cargarHistoricos();
@@ -921,6 +919,9 @@ async function loadData() {
       console.error('❌ Error cargando históricos:', e);
       window.HIST = {}; // Inicializar como objeto vacío
     }
+    
+    // AHORA renderizar con HIST listo
+    applyFilters();
     
     // Setear logos en tabs de planta
     if (typeof PLANTA_LOGOS !== 'undefined') {
@@ -1628,17 +1629,58 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
     pctTrimAcum.push(acProd>0 ? acTrim/acProd*100 : 0);
   });
 
-  // Gráfica Comparativa: Tons Embarcadas Año Anterior vs Actual (PENDIENTE)
-  // TODO: Debuggear cargarHistoricos() - probablemente es CORS error en fetch
+  // Gráfica Comparativa: Tons Embarcadas Año Anterior vs Actual
   destroyChart(`chartTonsComparativa${id}`);
   
-  // Por ahora mostramos un mensaje
-  const canvasEl = document.getElementById(`chartTonsComparativa${id}`);
-  if (canvasEl) {
-    const ctx = canvasEl.getContext('2d');
-    ctx.fillStyle = '#999';
-    ctx.font = '14px sans-serif';
-    ctx.fillText('Cargando datos históricos...', 20, 30);
+  if (window.HIST && window.HIST[id]?.ton) {
+    const MESES_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const anioActual = new Date().getFullYear();
+    const anioAnterior = anioActual - 1;
+    
+    const datosActual = [];
+    const datosAnterior = [];
+    
+    for (let mes = 1; mes <= 12; mes++) {
+      datosActual.push(window.HIST[id].ton[anioActual]?.[mes] || 0);
+      datosAnterior.push(window.HIST[id].ton[anioAnterior]?.[mes] || 0);
+    }
+    
+    CHARTS[`chartTonsComparativa${id}`] = new Chart(document.getElementById(`chartTonsComparativa${id}`),{
+      type:'line',
+      data:{ 
+        labels:MESES_NAMES,
+        datasets:[
+          { 
+            label:`${anioAnterior}`, 
+            data:datosAnterior, 
+            borderColor:'#999', 
+            backgroundColor:'transparent', 
+            borderWidth:2, 
+            tension:0.3, 
+            pointRadius:4,
+            pointBackgroundColor:'#999'
+          },
+          { 
+            label:`${anioActual}`, 
+            data:datosActual, 
+            borderColor:'#0066cc', 
+            backgroundColor:'rgba(0,102,204,0.1)', 
+            borderWidth:3, 
+            fill:true,
+            tension:0.3, 
+            pointRadius:5,
+            pointBackgroundColor:'#0066cc'
+          }
+        ]
+      },
+      options:{
+        ...chartOpts('kg'),
+        interaction:{mode:'index', intersect:false}
+      }
+    });
+    console.log(`✅ Gráfica comparativa ${id} dibujada`);
+  } else {
+    console.warn(`⚠️ No hay datos históricos para ${id}. HIST:`, window.HIST);
   }
 
 }
