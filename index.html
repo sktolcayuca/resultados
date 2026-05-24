@@ -746,6 +746,49 @@ function mejorMes(historico, mes) {
   return { valor: mejor, anio: mejorAnio };
 }
 
+// Cargar datos GALICIA
+async function cargarGalicia() {
+  const GID_GALICIA = '459821810';
+  const SHEET_ID = '1G_zCNp3ZMUkc2TF1eAopTDnGC07d8p_zOFUaiKcveIY';
+  
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_GALICIA}`;
+    const res = await fetch(url);
+    const csv = await res.text();
+    
+    // Parsear CSV
+    const lines = csv.trim().split('\n');
+    let ultimoIndex = -1;
+    
+    // Buscar última fila con datos completos (que tenga fecha, piezas y tons)
+    for (let i = lines.length - 1; i >= 1; i--) {
+      const cols = lines[i].split(',').map(c => c.trim());
+      if (cols[0] && cols[2] && cols[5]) { // Fecha, Toneladas, Acum Ton
+        ultimoIndex = i;
+        break;
+      }
+    }
+    
+    if (ultimoIndex >= 1) {
+      const cols = lines[ultimoIndex].split(',').map(c => c.trim());
+      const piezas = parseNum(cols[4]); // Acum pzas
+      const tons = parseNum(cols[5]);   // Acum Ton
+      const fecha = cols[0];             // Fecha
+      
+      document.getElementById('galiciaPiezas').textContent = fmt(piezas, 0);
+      document.getElementById('galiciaTons').textContent = fmt(tons, 0);
+      document.getElementById('galiciaFecha').textContent = fecha;
+      
+      console.log('✅ GALICIA cargado:', {piezas, tons, fecha});
+    }
+  } catch(e) {
+    console.error('❌ Error cargando GALICIA:', e);
+    document.getElementById('galiciaPiezas').textContent = '—';
+    document.getElementById('galiciaTons').textContent = '—';
+    document.getElementById('galiciaFecha').textContent = 'Sin datos';
+  }
+}
+
 function poblarMejorMes(HIST, mes) {
   const plantas = ['SK', 'Glama', 'Desa'];
   
@@ -1177,6 +1220,17 @@ function renderResumen(filtered, filteredDev, metas, mes, anio, corte) {
       <div class="kpi-label">Devoluciones — TOTAL</div>
       <div class="kpi-value">${total.devCount}</div>
       <div class="kpi-unit">${fmt(total.devKilos,0)} kg devueltos</div>
+    </div>
+    <div class="kpi-card" style="border-left:4px solid #ffd166;background:rgba(255,209,102,0.05)">
+      <div class="kpi-label" style="color:#ffd166;">GALICIA</div>
+      <div class="kpi-label" style="color:#ffd166;font-size:28px;letter-spacing:2px;margin:12px 0;" id="galiciaPiezas">—</div>
+      <div class="kpi-unit" style="margin-bottom:8px;">piezas</div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);">
+        <strong id="galiciaTons">—</strong> ton
+      </div>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);margin-top:6px;">
+        <span id="galiciaFecha">—</span>
+      </div>
     </div>`;
 
   // Cards por planta
@@ -1266,6 +1320,9 @@ function renderResumen(filtered, filteredDev, metas, mes, anio, corte) {
 
   // Pareto devoluciones todas las plantas
   renderPareto([...filteredDev.SK,...filteredDev.Glama,...filteredDev.Desa]);
+  
+  // Cargar datos GALICIA
+  cargarGalicia();
 
   // Tabla resumen
   document.getElementById('tablaResumen').innerHTML = PLANTAS.map(p => {
