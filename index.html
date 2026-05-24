@@ -658,35 +658,51 @@ async function cargarHistoricos() {
   };
   
   const HIST = {};
+  console.log('🔄 Iniciando carga de históricos...');
   
   for (const [planta, gids] of Object.entries(historicos)) {
     HIST[planta] = {};
+    console.log(`📦 Cargando ${planta}...`);
     
     // Cargar TON
     try {
       const urlTon = `https://docs.google.com/spreadsheets/d/1G_zCNp3ZMUkc2TF1eAopTDnGC07d8p_zOFUaiKcveIY/export?format=csv&gid=${gids.ton}`;
+      console.log(`  ⬇️ Tons desde: ${urlTon.substr(0,80)}...`);
       const resTon = await fetch(urlTon);
+      console.log(`  ✅ Respuesta Tons:`, resTon.status);
+      if (!resTon.ok) throw new Error(`HTTP ${resTon.status}`);
       const csvTon = await resTon.text();
+      console.log(`  📊 CSV Tons: ${csvTon.substr(0,50)}...`);
       HIST[planta].ton = parseHistorico(csvTon);
-    } catch(e) { console.warn(`Error cargando TON ${planta}:`, e); }
+      console.log(`  ✅ Tons parseado:`, HIST[planta].ton);
+    } catch(e) { console.error(`❌ Error cargando TON ${planta}:`, e); }
     
     // Cargar m2
     try {
       const urlM2 = `https://docs.google.com/spreadsheets/d/1G_zCNp3ZMUkc2TF1eAopTDnGC07d8p_zOFUaiKcveIY/export?format=csv&gid=${gids.m2}`;
+      console.log(`  ⬇️ m2 desde: ${urlM2.substr(0,80)}...`);
       const resM2 = await fetch(urlM2);
+      console.log(`  ✅ Respuesta m2:`, resM2.status);
+      if (!resM2.ok) throw new Error(`HTTP ${resM2.status}`);
       const csvM2 = await resM2.text();
       HIST[planta].m2 = parseHistorico(csvM2);
-    } catch(e) { console.warn(`Error cargando m2 ${planta}:`, e); }
+      console.log(`  ✅ m2 parseado:`, HIST[planta].m2);
+    } catch(e) { console.error(`❌ Error cargando m2 ${planta}:`, e); }
     
     // Cargar DEVOL
     try {
       const urlDevol = `https://docs.google.com/spreadsheets/d/1G_zCNp3ZMUkc2TF1eAopTDnGC07d8p_zOFUaiKcveIY/export?format=csv&gid=${gids.devol}`;
+      console.log(`  ⬇️ Devol desde: ${urlDevol.substr(0,80)}...`);
       const resDevol = await fetch(urlDevol);
+      console.log(`  ✅ Respuesta Devol:`, resDevol.status);
+      if (!resDevol.ok) throw new Error(`HTTP ${resDevol.status}`);
       const csvDevol = await resDevol.text();
       HIST[planta].devol = parseHistorico(csvDevol);
-    } catch(e) { console.warn(`Error cargando DEVOL ${planta}:`, e); }
+      console.log(`  ✅ Devol parseado:`, HIST[planta].devol);
+    } catch(e) { console.error(`❌ Error cargando DEVOL ${planta}:`, e); }
   }
   
+  console.log('✅ Históricos cargados:', HIST);
   return HIST;
 }
 
