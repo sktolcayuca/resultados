@@ -302,13 +302,9 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
       </div>
     </div>
     <div class="charts-grid-2">
-      <div class="chart-card">
-        <div class="chart-title">% Merma Trim — Acumulado <span class="chart-tag">ÁREA</span></div>
-        <canvas id="chartMermaTrimSK"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">% Merma Proceso — Acumulado <span class="chart-tag">ÁREA</span></div>
-        <canvas id="chartMermaProcSK"></canvas>
+      <div class="chart-card" style="grid-column: span 2;">
+        <div class="chart-title">Tons Embarcadas: Año Anterior vs Actual (Mes a Mes) <span class="chart-tag">LÍNEAS</span></div>
+        <canvas id="chartTonsComparativaSK"></canvas>
       </div>
     </div>
   </div>
@@ -361,13 +357,9 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
       </div>
     </div>
     <div class="charts-grid-2">
-      <div class="chart-card">
-        <div class="chart-title">% Merma Trim — Acumulado <span class="chart-tag">ÁREA</span></div>
-        <canvas id="chartMermaTrimGlama"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">% Merma Proceso — Acumulado <span class="chart-tag">ÁREA</span></div>
-        <canvas id="chartMermaProcGlama"></canvas>
+      <div class="chart-card" style="grid-column: span 2;">
+        <div class="chart-title">Tons Embarcadas: Año Anterior vs Actual (Mes a Mes) <span class="chart-tag">LÍNEAS</span></div>
+        <canvas id="chartTonsComparativaGlama"></canvas>
       </div>
     </div>
   </div>
@@ -420,13 +412,9 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
       </div>
     </div>
     <div class="charts-grid-2">
-      <div class="chart-card">
-        <div class="chart-title">% Merma Trim — Acumulado <span class="chart-tag">ÁREA</span></div>
-        <canvas id="chartMermaTrimDesa"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">% Merma Proceso — Acumulado <span class="chart-tag">ÁREA</span></div>
-        <canvas id="chartMermaProcDesa"></canvas>
+      <div class="chart-card" style="grid-column: span 2;">
+        <div class="chart-title">Tons Embarcadas: Año Anterior vs Actual (Mes a Mes) <span class="chart-tag">LÍNEAS</span></div>
+        <canvas id="chartTonsComparativaDesa"></canvas>
       </div>
     </div>
   </div>
@@ -1618,34 +1606,58 @@ function renderPlanta(planta, datos, devol, meta, allFiltered, mes, anio, corte)
     pctTrimAcum.push(acProd>0 ? acTrim/acProd*100 : 0);
   });
 
-  destroyChart(`chartMermaTrim${id}`);
-  CHARTS[`chartMermaTrim${id}`] = new Chart(document.getElementById(`chartMermaTrim${id}`),{
-    type:'line',
-    data:{ labels:dias, datasets:[
-      { label:'% Trim acum.', data:pctTrimAcum, borderColor:'#ff6b35', backgroundColor:'rgba(255,107,53,0.1)', borderWidth:2, fill:true, tension:0.3, pointRadius:3 },
-      { label:`Meta ${META_TRIM_PCT}%`, data:dias.map(()=>META_TRIM_PCT), borderColor:'#d63031', borderDash:[5,5], pointRadius:0, borderWidth:1.5 }
-    ]},
-    options: chartOpts('%')
-  });
+  // Gráfica Comparativa: Tons Embarcadas Año Anterior vs Actual
+  destroyChart(`chartTonsComparativa${id}`);
+  
+  // Cargar datos históricos si están disponibles
+  if (HIST && HIST[id]?.ton) {
+    const MESES_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const anioActual = new Date().getFullYear();
+    const anioAnterior = anioActual - 1;
+    
+    const datosActual = [];
+    const datosAnterior = [];
+    
+    for (let mes = 1; mes <= 12; mes++) {
+      datosActual.push(HIST[id].ton[anioActual]?.[mes] || 0);
+      datosAnterior.push(HIST[id].ton[anioAnterior]?.[mes] || 0);
+    }
+    
+    CHARTS[`chartTonsComparativa${id}`] = new Chart(document.getElementById(`chartTonsComparativa${id}`),{
+      type:'line',
+      data:{ 
+        labels:MESES_NAMES,
+        datasets:[
+          { 
+            label:`${anioAnterior}`, 
+            data:datosAnterior, 
+            borderColor:'#999', 
+            backgroundColor:'transparent', 
+            borderWidth:2, 
+            tension:0.3, 
+            pointRadius:4,
+            pointBackgroundColor:'#999'
+          },
+          { 
+            label:`${anioActual}`, 
+            data:datosActual, 
+            borderColor:'#0066cc', 
+            backgroundColor:'rgba(0,102,204,0.1)', 
+            borderWidth:3, 
+            fill:true,
+            tension:0.3, 
+            pointRadius:5,
+            pointBackgroundColor:'#0066cc'
+          }
+        ]
+      },
+      options:{
+        ...chartOpts('kg'),
+        interaction:{mode:'index', intersect:false}
+      }
+    });
+  }
 
-  // Chart merma proceso acumulado
-  let acProc=0, acProd2=0;
-  const pctProcAcum = [];
-  sortedData.forEach(r => {
-    acProc += r.mermaProc||0;
-    acProd2+= r.tonProd||0;
-    pctProcAcum.push(acProd2>0 ? acProc/acProd2*100 : 0);
-  });
-
-  destroyChart(`chartMermaProc${id}`);
-  CHARTS[`chartMermaProc${id}`] = new Chart(document.getElementById(`chartMermaProc${id}`),{
-    type:'line',
-    data:{ labels:dias, datasets:[
-      { label:'% Proceso acum.', data:pctProcAcum, borderColor:'#d63031', backgroundColor:'rgba(214,48,49,0.1)', borderWidth:2, fill:true, tension:0.3, pointRadius:3 },
-      { label:`Meta ${META_PROC_PCT}%`, data:dias.map(()=>META_PROC_PCT), borderColor:'#ffd166', borderDash:[5,5], pointRadius:0, borderWidth:1.5 }
-    ]},
-    options: chartOpts('%')
-  });
 }
 
 // ═══════════════════════════════════════════════════════════════
