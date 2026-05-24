@@ -897,8 +897,8 @@ async function loadData() {
     
     // Cargar Históricos para cuadros de "Mejor Mes"
     document.getElementById('loadingMsg').textContent = 'CARGANDO HISTÓRICOS...';
-    const HIST = await cargarHistoricos();
-    poblarMejorMes(HIST, mesActual);
+    window.HIST = await cargarHistoricos();
+    poblarMejorMes(window.HIST, mesActual);
     
     // Setear logos en tabs de planta
     if (typeof PLANTA_LOGOS !== 'undefined') {
