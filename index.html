@@ -177,23 +177,23 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
     <div class="filter-group">
       <span class="filter-label">MES(ES)</span>
       <div style="position:relative;">
-        <button id="mesDisplayBtn" style="background:none;border:none;color:var(--text);font-size:14px;cursor:pointer;padding:6px 10px;border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;gap:8px;font-weight:500;" onclick="toggleMesDropdown()">
+        <button id="mesDisplayBtn" style="background:#222;border:1px solid #444;color:#fff;font-size:14px;cursor:pointer;padding:8px 12px;border-radius:4px;display:flex;align-items:center;gap:8px;font-weight:500;font-family:inherit;" onclick="toggleMesDropdown()">
           <span id="mesDisplay">Mayo</span>
-          <span style="font-size:10px;color:var(--text-dim);">▼</span>
+          <span style="font-size:10px;color:#888;">▼</span>
         </button>
-        <div id="mesDropdown" style="position:absolute;top:100%;right:0;background:#fff;border:1px solid var(--border);border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:8px;min-width:180px;display:none;z-index:1000;max-height:300px;overflow-y:auto;">
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="1" onchange="updateMesDisplay()"> Enero</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="2" onchange="updateMesDisplay()"> Febrero</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="3" onchange="updateMesDisplay()"> Marzo</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="4" onchange="updateMesDisplay()"> Abril</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="5" onchange="updateMesDisplay()" checked> Mayo</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="6" onchange="updateMesDisplay()"> Junio</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="7" onchange="updateMesDisplay()"> Julio</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="8" onchange="updateMesDisplay()"> Agosto</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="9" onchange="updateMesDisplay()"> Septiembre</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="10" onchange="updateMesDisplay()"> Octubre</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="11" onchange="updateMesDisplay()"> Noviembre</label>
-          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="12" onchange="updateMesDisplay()"> Diciembre</label>
+        <div id="mesDropdown" style="position:absolute;top:100%;right:0;background:#1a1a1a;border:1px solid #444;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.5);padding:8px;min-width:180px;display:none;z-index:1000;max-height:300px;overflow-y:auto;">
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="1" onchange="updateMesDisplay()" style="margin-right:8px;"> Enero</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="2" onchange="updateMesDisplay()" style="margin-right:8px;"> Febrero</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="3" onchange="updateMesDisplay()" style="margin-right:8px;"> Marzo</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="4" onchange="updateMesDisplay()" style="margin-right:8px;"> Abril</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="5" onchange="updateMesDisplay()" checked style="margin-right:8px;"> Mayo</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="6" onchange="updateMesDisplay()" style="margin-right:8px;"> Junio</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="7" onchange="updateMesDisplay()" style="margin-right:8px;"> Julio</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="8" onchange="updateMesDisplay()" style="margin-right:8px;"> Agosto</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="9" onchange="updateMesDisplay()" style="margin-right:8px;"> Septiembre</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="10" onchange="updateMesDisplay()" style="margin-right:8px;"> Octubre</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="11" onchange="updateMesDisplay()" style="margin-right:8px;"> Noviembre</label>
+          <label style="display:block;padding:6px 8px;cursor:pointer;user-select:none;color:#ddd;"><input type="checkbox" value="12" onchange="updateMesDisplay()" style="margin-right:8px;"> Diciembre</label>
         </div>
       </div>
     </div>
