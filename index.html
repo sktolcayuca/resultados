@@ -176,14 +176,26 @@ footer{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify
     </div>
     <div class="filter-group">
       <span class="filter-label">MES(ES)</span>
-      <select id="filterMes" onchange="applyFilters()" multiple style="min-height:80px;">
-        <option value="1" selected>Enero</option><option value="2" selected>Febrero</option>
-        <option value="3" selected>Marzo</option><option value="4" selected>Abril</option>
-        <option value="5" selected>Mayo</option><option value="6" selected>Junio</option>
-        <option value="7" selected>Julio</option><option value="8" selected>Agosto</option>
-        <option value="9" selected>Septiembre</option><option value="10" selected>Octubre</option>
-        <option value="11" selected>Noviembre</option><option value="12" selected>Diciembre</option>
-      </select>
+      <div style="position:relative;">
+        <button id="mesDisplayBtn" style="background:none;border:none;color:var(--text);font-size:14px;cursor:pointer;padding:6px 10px;border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;gap:8px;font-weight:500;" onclick="toggleMesDropdown()">
+          <span id="mesDisplay">Mayo</span>
+          <span style="font-size:10px;color:var(--text-dim);">▼</span>
+        </button>
+        <div id="mesDropdown" style="position:absolute;top:100%;right:0;background:#fff;border:1px solid var(--border);border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:8px;min-width:180px;display:none;z-index:1000;max-height:300px;overflow-y:auto;">
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="1" onchange="updateMesDisplay()"> Enero</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="2" onchange="updateMesDisplay()"> Febrero</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="3" onchange="updateMesDisplay()"> Marzo</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="4" onchange="updateMesDisplay()"> Abril</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="5" onchange="updateMesDisplay()" checked> Mayo</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="6" onchange="updateMesDisplay()"> Junio</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="7" onchange="updateMesDisplay()"> Julio</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="8" onchange="updateMesDisplay()"> Agosto</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="9" onchange="updateMesDisplay()"> Septiembre</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="10" onchange="updateMesDisplay()"> Octubre</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="11" onchange="updateMesDisplay()"> Noviembre</label>
+          <label style="display:block;padding:4px 8px;cursor:pointer;user-select:none;"><input type="checkbox" value="12" onchange="updateMesDisplay()"> Diciembre</label>
+        </div>
+      </div>
     </div>
     <div class="status-pill"><div class="status-dot"></div><span id="lastUpdate">CONECTANDO...</span></div>
   </div>
@@ -940,7 +952,11 @@ async function loadData() {
 
     // Setear filtros al mes/año actual
     document.getElementById('filterAnio').value = anioActual.toString();
-    document.getElementById('filterMes').value  = mesActual.toString();
+    // Setear solo el mes actual como seleccionado
+    document.querySelectorAll('#mesDropdown input[type="checkbox"]').forEach(cb => {
+      cb.checked = (parseInt(cb.value) === mesActual);
+    });
+    updateMesDisplay();
 
     await new Promise(r => setTimeout(r, 800));
     document.getElementById('loading').style.display = 'none';
@@ -987,13 +1003,42 @@ async function loadData() {
 // ═══════════════════════════════════════════════════════════════
 // FILTROS Y RENDER PRINCIPAL
 // ═══════════════════════════════════════════════════════════════
+function toggleMesDropdown() {
+  const dropdown = document.getElementById('mesDropdown');
+  dropdown.style.display = dropdown.style.display==='none' ? 'block' : 'none';
+}
+
+function updateMesDisplay() {
+  const checkboxes = document.querySelectorAll('#mesDropdown input[type="checkbox"]');
+  const checked = Array.from(checkboxes).filter(cb => cb.checked);
+  const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  
+  if (checked.length === 0) {
+    document.getElementById('mesDisplay').textContent = 'Selecciona meses';
+  } else if (checked.length === 1) {
+    const mesIdx = parseInt(checked[0].value) - 1;
+    document.getElementById('mesDisplay').textContent = meses[mesIdx];
+  } else {
+    document.getElementById('mesDisplay').textContent = `${checked.length} meses`;
+  }
+  
+  applyFilters();
+}
+
+function getMesesSeleccionados() {
+  const checkboxes = document.querySelectorAll('#mesDropdown input[type="checkbox"]:checked');
+  return Array.from(checkboxes).map(cb => parseInt(cb.value));
+}
+
 function applyFilters() {
   const anio   = parseInt(document.getElementById('filterAnio').value);
-  const mesSelect = document.getElementById('filterMes');
-  const mesesSelected = Array.from(mesSelect.selectedOptions).map(opt => parseInt(opt.value));
+  const mesesSelected = getMesesSeleccionados();
   
   // Si no hay meses seleccionados, no hacer nada
   if(mesesSelected.length === 0) return;
+  
+  // Cerrar el dropdown
+  document.getElementById('mesDropdown').style.display = 'none';
   
   const esMultiple = mesesSelected.length > 1;
   const mes = esMultiple ? null : mesesSelected[0];
@@ -1935,11 +1980,11 @@ function renderDevoluciones(filteredDev, filtered) {
 function renderTablaDiario(mes, anio, corte) {
   const plantaId = document.getElementById('filterPlantaDiario').value;
   const plantaIdKey = { sk: 'SK', glama: 'Glama', desa: 'Desa' }[plantaId] || plantaId;
-  const mesVal   = document.getElementById('filterMes').value;
-  const mesAll   = mesVal === 'all';
+  const mesesSeleccionados = getMesesSeleccionados();
+  const mesAll   = mesesSeleccionados.length > 1;
 
   const datos = (DATA[plantaIdKey] || []).filter(r =>
-    r.anio === anio && (mesAll || (r.mes === mes && r.dia <= corte))
+    r.anio === anio && mesesSeleccionados.includes(r.mes) && r.dia <= corte
   ).sort((a,b)=>b.dia-a.dia);
 
   let acum=0;
